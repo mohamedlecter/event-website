@@ -1,12 +1,12 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  fetchEvents, 
-  fetchEventDetails, 
-  initiatePayment, 
+import { createContext, useContext, useState, useEffect } from "react";
+import {
+  fetchEvents,
+  fetchEventDetails,
+  initiatePayment,
   verifyPayment,
   fetchUserTickets,
-  transferTicket
-} from '../services/eventService';
+  transferTicket,
+} from "../services/eventService";
 
 const EventContext = createContext();
 
@@ -47,31 +47,33 @@ export const EventProvider = ({ children }) => {
 
   const filterEvents = (filters) => {
     let results = [...events];
-    
+
     if (filters.category) {
-      results = results.filter(event => event.category === filters.category);
+      results = results.filter((event) => event.category === filters.category);
     }
-    
+
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
-      results = results.filter(event => 
-        event.title.toLowerCase().includes(searchTerm) ||
-        event.description.toLowerCase().includes(searchTerm)
+      results = results.filter(
+        (event) =>
+          event.title.toLowerCase().includes(searchTerm) ||
+          event.description.toLowerCase().includes(searchTerm)
       );
     }
-    
+
     if (filters.upcoming) {
       const now = new Date();
-      results = results.filter(event => new Date(event.date) > now);
+      results = results.filter((event) => new Date(event.date) > now);
     }
-    
+
     setFilteredEvents(results);
   };
 
   const purchaseTickets = async (eventId, ticketData) => {
     setIsLoading(true);
+    const token = localStorage.getItem("token"); // Or however you store the token
     try {
-      const paymentData = await initiatePayment(eventId, ticketData);
+      const paymentData = await initiatePayment(eventId, ticketData, token); // Pass token here
       return paymentData;
     } catch (err) {
       setError(err.message);
@@ -83,8 +85,9 @@ export const EventProvider = ({ children }) => {
 
   const confirmPayment = async (reference) => {
     setIsLoading(true);
+    const token = localStorage.getItem("token"); // Or however you store the token
     try {
-      const payment = await verifyPayment(reference);
+      const payment = await verifyPayment(reference, token);
       return payment;
     } catch (err) {
       setError(err.message);
@@ -96,9 +99,12 @@ export const EventProvider = ({ children }) => {
 
   const getUserTickets = async () => {
     setIsLoading(true);
+    const token = localStorage.getItem("token"); // Or however you store the token
     try {
-      const data = await fetchUserTickets();
+      const data = await fetchUserTickets(token);
       setTickets(data);
+      console.log("tickets", data);
+
       return data;
     } catch (err) {
       setError(err.message);
@@ -111,9 +117,9 @@ export const EventProvider = ({ children }) => {
     setIsLoading(true);
     try {
       const data = await transferTicket(ticketId, recipientEmail);
-      setTickets(tickets.map(ticket => 
-        ticket._id === ticketId ? data : ticket
-      ));
+      setTickets(
+        tickets.map((ticket) => (ticket._id === ticketId ? data : ticket))
+      );
       return data;
     } catch (err) {
       setError(err.message);

@@ -1,21 +1,23 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const EventCard = ({ event }) => {
   const eventDate = new Date(event.date);
   const now = new Date();
   const isUpcoming = eventDate > now;
 
+  console.log(event);
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
       <Link to={`/events/${event._id}`}>
         <div className="h-48 overflow-hidden">
-          <img 
-            src={event.image || '/placeholder-event.jpg'} 
+          <img
+            src={event.image || "/placeholder-event.jpg"}
             alt={event.title}
             className="w-full h-full object-cover"
           />
         </div>
-        
+
         <div className="p-4">
           <div className="flex justify-between items-start mb-2">
             <h3 className="font-bold text-lg truncate">{event.title}</h3>
@@ -29,17 +31,17 @@ const EventCard = ({ event }) => {
               </span>
             )}
           </div>
-          
+
           <p className="text-gray-600 text-sm mb-3">
-            {eventDate.toLocaleDateString('en-US', { 
-              month: 'short', 
-              day: 'numeric',
-              year: 'numeric'
+            {eventDate.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
             })}
-            {' • '}
+            {" • "}
             {event.location.city}, {event.location.country}
           </p>
-          
+
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium">
               From ${event.standardTicket.price}
