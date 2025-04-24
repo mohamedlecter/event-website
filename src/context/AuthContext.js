@@ -48,6 +48,8 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", token);
       setToken(token);
       setUser(user);
+
+      console.log("User logged in:", user);
       navigate(user.role === "admin" ? "/admin" : "/events");
       return { success: true };
     } catch (err) {

@@ -115,8 +115,9 @@ export const EventProvider = ({ children }) => {
 
   const transferUserTicket = async (ticketId, recipientEmail) => {
     setIsLoading(true);
+    const token = localStorage.getItem("token");
     try {
-      const data = await transferTicket(ticketId, recipientEmail);
+      const data = await transferTicket(ticketId, recipientEmail, token);
       setTickets(
         tickets.map((ticket) => (ticket._id === ticketId ? data : ticket))
       );

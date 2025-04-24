@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { fetchEvents, deleteEvent } from '../../services/adminService';
-import LoadingSpinner from '../ui/LoadingSpinner';
-import ErrorAlert from '../ui/ErrorAlert';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { fetchEvents, deleteEvent } from "../../services/adminService";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import ErrorAlert from "../ui/ErrorAlert";
 
 const AdminEvents = () => {
   const [events, setEvents] = useState([]);
@@ -20,16 +20,16 @@ const AdminEvents = () => {
         setIsLoading(false);
       }
     };
-    
+
     loadEvents();
   }, []);
 
   const handleDelete = async (eventId) => {
-    if (!window.confirm('Are you sure you want to delete this event?')) return;
-    
+    if (!window.confirm("Are you sure you want to delete this event?")) return;
+
     try {
       await deleteEvent(eventId);
-      setEvents(events.filter(event => event._id !== eventId));
+      setEvents(events.filter((event) => event._id !== eventId));
     } catch (err) {
       setError(err.message);
     }
@@ -42,14 +42,14 @@ const AdminEvents = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Manage Events</h2>
-        <Link 
-          to="/admin/events/new" 
+        <Link
+          to="/admin/events/new"
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
         >
           Create New Event
         </Link>
       </div>
-      
+
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -72,16 +72,16 @@ const AdminEvents = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {events.map(event => (
+            {events.map((event) => (
               <tr key={event._id}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10">
-                      <img 
-                        className="h-10 w-10 rounded-full object-cover" 
-                        src={event.image || '/placeholder-event.jpg'} 
+                      {/* <img
+                        className="h-10 w-10 rounded-full object-cover"
+                        src={event.image || "/placeholder-event.jpg"}
                         alt={event.title}
-                      />
+                      /> */}
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">
@@ -100,10 +100,12 @@ const AdminEvents = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    <span className="font-medium">Standard:</span> {event.standardTicket.sold}/{event.standardTicket.quantity}
+                    <span className="font-medium">Standard:</span>{" "}
+                    {event.standardTicket.sold}/{event.standardTicket.quantity}
                   </div>
                   <div className="text-sm text-gray-900">
-                    <span className="font-medium">VIP:</span> {event.vipTicket.sold}/{event.vipTicket.quantity}
+                    <span className="font-medium">VIP:</span>{" "}
+                    {event.vipTicket.sold}/{event.vipTicket.quantity}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
