@@ -20,6 +20,7 @@ const EventDetails = () => {
   }, [id]);
 
   const event = selectedEvent;
+  const serverUrl = "http://localhost:4000";
 
   if (isLoading || !event) return <LoadingSpinner />;
 
@@ -36,7 +37,11 @@ const EventDetails = () => {
       <div className="md:flex">
         <div className="md:w-1/2">
           <img
-            src={event.image || "/placeholder-event.jpg"}
+            src={
+              event.image
+                ? `${serverUrl}/${event.image.replace(/\\/g, "/")}`
+                : "/placeholder-event.jpg"
+            }
             alt={event.title}
             className="w-full h-full object-cover"
           />

@@ -7,12 +7,18 @@ const EventCard = ({ event }) => {
 
   console.log(event);
 
+  const serverUrl = "http://localhost:4000";
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
       <Link to={`/events/${event._id}`}>
         <div className="h-48 overflow-hidden">
           <img
-            src={event.image || "/placeholder-event.jpg"}
+            src={
+              event.image
+                ? `${serverUrl}/${event.image.replace(/\\/g, "/")}`
+                : "/placeholder-event.jpg"
+            }
             alt={event.title}
             className="w-full h-full object-cover"
           />

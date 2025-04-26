@@ -52,3 +52,26 @@ export const transferTicket = async (ticketId, recipientEmail, token) => {
   );
   return response.data;
 };
+
+export const createEvent = async (eventData) => {
+  const token = localStorage.getItem("token"); // Or your auth method
+  const formData = new FormData();
+
+  // Since image upload is involved, we use FormData
+  for (const key in eventData) {
+    formData.append(key, eventData[key]);
+  }
+
+  const response = await axios.post(
+    "http://localhost:4000/api/events/",
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+};

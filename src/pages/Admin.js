@@ -4,6 +4,7 @@ import AdminEvents from "../components/admin/AdminEvents";
 import AdminPayments from "../components/admin/AdminPayments";
 import AdminTicketScanner from "../components/admin/AdminTicketScanner";
 import EventAnalytics from "../components/admin/EventAnalytics";
+import CreateEventPage from "../components/admin/CreateEventPage";
 
 const Admin = () => {
   return (
@@ -72,6 +73,7 @@ const Admin = () => {
           <Route path="/payments" element={<AdminPayments />} />
           <Route path="/scanner" element={<AdminTicketScanner />} />
           <Route path="/events/:eventId" element={<EventAnalytics />} />
+          <Route path="/events/new" element={<CreateEventPage />} />
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>
       </main>
