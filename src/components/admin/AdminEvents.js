@@ -1,42 +1,33 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { fetchEvents, deleteEvent } from "../../services/adminService";
+import { useAdmin } from "../../context/AdminContext"; // Adjust import path as needed
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";
 
 const AdminEvents = () => {
-  const [events, setEvents] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    adminEvents: events,
+    fetchAdminEvents,
+    removeEvent,
+    isLoadingEvents,
+    error,
+  } = useAdmin();
+
+  console.log("Admin loadin", isLoadingEvents);
 
   useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        const data = await fetchEvents();
-        setEvents(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadEvents();
+    fetchAdminEvents();
   }, []);
 
   const handleDelete = async (eventId) => {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
 
-    try {
-      await deleteEvent(eventId);
-      setEvents(events.filter((event) => event._id !== eventId));
-    } catch (err) {
-      setError(err.message);
-    }
+    await removeEvent(eventId);
   };
+
   const serverUrl = "http://localhost:4000";
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoadingEvents) return <LoadingSpinner />;
   if (error) return <ErrorAlert message={error} />;
 
   return (

@@ -1,40 +1,39 @@
 import axios from 'axios';
-
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
-const setAuthHeader = (token) => {
-  if (token) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  } else {
-    delete axios.defaults.headers.common['Authorization'];
-  }
-};
-
 export const getDashboardStats = async (token) => {
-  setAuthHeader(token);
-  const response = await axios.get(`${API_URL}/admin/dashboard`);
+  const response = await axios.get(`${API_URL}/admin/dashboard`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response.data;
 };
 
 export const fetchEvents = async (token) => {
-  setAuthHeader(token);
-  const response = await axios.get(`${API_URL}/events`);
+  const response = await axios.get(`${API_URL}/events`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response.data;
 };
 
 export const fetchAllPayments = async (token) => {
-  setAuthHeader(token);
-  const response = await axios.get(`${API_URL}/admin/payments`);
+  const response = await axios.get(`${API_URL}/admin/payments`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response.data;
 };
 
 export const getEventAnalytics = async (eventId, token) => {
-  setAuthHeader(token);
-  const response = await axios.get(`${API_URL}/admin/events/${eventId}/analytics`);
+  const response = await axios.get(
+    `${API_URL}/admin/events/${eventId}/analytics`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
   return response.data;
 };
 
 export const deleteEvent = async (eventId, token) => {
-  setAuthHeader(token);
-  await axios.delete(`${API_URL}/events/${eventId}`);
+  console.log('Deleting event with ID:', eventId); // Debugging line
+  console.log('Using token:', token); // Debugging line
+  await axios.delete(`${API_URL}/events/${eventId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 };

@@ -14,49 +14,55 @@ export const AdminProvider = ({ children }) => {
   const [adminEvents, setAdminEvents] = useState([]);
   const [payments, setPayments] = useState([]);
   const [analytics, setAnalytics] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+
+  // Separate loading states for each data type
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(false);
+  const [isLoadingPayments, setIsLoadingPayments] = useState(false);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
+
   const [error, setError] = useState(null);
 
   const token = localStorage.getItem("token");
 
   const fetchDashboardStats = async () => {
-    setIsLoading(true);
+    setIsLoadingStats(true);
     try {
       const data = await getDashboardStats(token);
       setStats(data);
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsLoading(false);
+      setIsLoadingStats(false);
     }
   };
 
   const fetchAdminEvents = async () => {
-    setIsLoading(true);
+    setIsLoadingEvents(true);
     try {
       const data = await fetchEvents(token);
       setAdminEvents(data);
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsLoading(false);
+      setIsLoadingEvents(false);
     }
   };
 
   const fetchPayments = async () => {
-    setIsLoading(true);
+    setIsLoadingPayments(true);
     try {
       const data = await fetchAllPayments(token);
       setPayments(data);
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsLoading(false);
+      setIsLoadingPayments(false);
     }
   };
 
   const fetchEventAnalytics = async (eventId) => {
-    setIsLoading(true);
+    setIsLoadingAnalytics(true);
     try {
       const data = await getEventAnalytics(eventId, token);
       setAnalytics(data);
@@ -64,19 +70,19 @@ export const AdminProvider = ({ children }) => {
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsLoading(false);
+      setIsLoadingAnalytics(false);
     }
   };
 
   const removeEvent = async (eventId) => {
-    setIsLoading(true);
+    setIsLoadingEvents(true);
     try {
       await deleteEvent(eventId, token);
       setAdminEvents((prev) => prev.filter((event) => event._id !== eventId));
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsLoading(false);
+      setIsLoadingEvents(false);
     }
   };
 
@@ -87,8 +93,11 @@ export const AdminProvider = ({ children }) => {
         adminEvents,
         payments,
         analytics,
-        isLoading,
         error,
+        isLoadingStats,
+        isLoadingEvents,
+        isLoadingPayments,
+        isLoadingAnalytics,
         fetchDashboardStats,
         fetchAdminEvents,
         fetchPayments,

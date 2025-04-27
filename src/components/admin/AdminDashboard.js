@@ -4,13 +4,13 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";
 
 const AdminDashboard = () => {
-  const { stats, isLoading, error, fetchDashboardStats } = useAdmin();
+  const { stats, isLoadingStats, error, fetchDashboardStats } = useAdmin();
 
   useEffect(() => {
     fetchDashboardStats();
   }, []);
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoadingStats) return <LoadingSpinner />;
   if (error) return <ErrorAlert message={error} />;
   if (!stats) return null;
 

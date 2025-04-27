@@ -4,7 +4,7 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";
 
 const AdminPayments = () => {
-  const { payments, isLoading, error, fetchPayments } = useAdmin();
+  const { payments, isLoadingPayments, error, fetchPayments } = useAdmin();
 
   // Only fetch the payments once when the component mounts
   useEffect(() => {
@@ -19,10 +19,10 @@ const AdminPayments = () => {
         <h2 className="text-2xl font-bold">Payment History</h2>
       </div>
 
-      {isLoading && <LoadingSpinner />}
+      {isLoadingPayments && <LoadingSpinner />}
       {error && <ErrorAlert message={error} />}
 
-      {!isLoading && !error && payments.length > 0 && (
+      {!isLoadingPayments && !error && payments.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -93,7 +93,7 @@ const AdminPayments = () => {
       )}
 
       {/* If no payments */}
-      {!isLoading && !error && payments.length === 0 && (
+      {!isLoadingPayments && !error && payments.length === 0 && (
         <div className="text-center py-4 text-gray-500">No payments found.</div>
       )}
     </div>

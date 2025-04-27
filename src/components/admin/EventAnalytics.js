@@ -1,32 +1,25 @@
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { getEventAnalytics } from '../../services/adminService';
+import { useAdmin } from '../../context/AdminContext';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorAlert from '../ui/ErrorAlert';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const EventAnalytics = () => {
   const { eventId } = useParams();
-  const [analytics, setAnalytics] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    fetchEventAnalytics,
+    analytics,
+    isLoadingAnalytics,
+    error,
+  } = useAdmin();
 
   useEffect(() => {
-    const loadAnalytics = async () => {
-      try {
-        const data = await getEventAnalytics(eventId);
-        setAnalytics(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadAnalytics();
+    fetchEventAnalytics(eventId);
+    // intentionally not adding fetchEventAnalytics to deps
   }, [eventId]);
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoadingAnalytics) return <LoadingSpinner />;
   if (error) return <ErrorAlert message={error} />;
   if (!analytics) return null;
 
@@ -60,7 +53,7 @@ const EventAnalytics = () => {
           </p>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="font-medium text-gray-500 mb-2">Total Tickets Sold</h3>
@@ -72,7 +65,7 @@ const EventAnalytics = () => {
             )}
           </p>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="font-medium text-gray-500 mb-2">Standard Tickets</h3>
           <p className="text-3xl font-bold">
@@ -82,7 +75,7 @@ const EventAnalytics = () => {
             {analytics.standardTicketsRemaining} remaining
           </p>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="font-medium text-gray-500 mb-2">VIP Tickets</h3>
           <p className="text-3xl font-bold">
@@ -93,7 +86,7 @@ const EventAnalytics = () => {
           </p>
         </div>
       </div>
-      
+
       <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
         <h3 className="font-medium text-gray-500 mb-4">Ticket Sales</h3>
         <div className="h-64">
@@ -118,7 +111,6 @@ const EventAnalytics = () => {
           </ResponsiveContainer>
         </div>
       </div>
-      
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <h3 className="font-medium text-gray-500 mb-4">Recent Payments</h3>
         <div className="overflow-x-auto">
