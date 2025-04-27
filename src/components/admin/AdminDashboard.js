@@ -6,13 +6,15 @@ import ErrorAlert from "../ui/ErrorAlert";
 const AdminDashboard = () => {
   const { stats, isLoadingStats, error, fetchDashboardStats } = useAdmin();
 
+  console.log("Admin loading", isLoadingStats);
+
   useEffect(() => {
     fetchDashboardStats();
   }, []);
 
-  if (isLoadingStats) return <LoadingSpinner />;
-  if (error) return <ErrorAlert message={error} />;
   if (!stats) return null;
+
+  console.log("Admin stats", stats);
 
   return (
     <div>

@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import LoadingSpinner from '../ui/LoadingSpinner';
-import ErrorAlert from '../ui/ErrorAlert';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import ErrorAlert from "../ui/ErrorAlert";
 
 const Register = () => {
   const [userData, setUserData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'user'
+    name: "",
+    email: "",
+    password: "",
+    role: "user", // Default to 'user'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -18,9 +18,9 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserData(prev => ({
+    setUserData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -28,16 +28,16 @@ const Register = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-    
+
     try {
       const result = await register(userData);
       if (result.success) {
-        navigate('/events');
+        navigate("/events");
       } else {
         setError(result.error);
       }
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -51,13 +51,15 @@ const Register = () => {
             Create a new account
           </h2>
         </div>
-        
+
         {error && <ErrorAlert message={error} />}
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="name" className="sr-only">Full Name</label>
+              <label htmlFor="name" className="sr-only">
+                Full Name
+              </label>
               <input
                 id="name"
                 name="name"
@@ -71,7 +73,9 @@ const Register = () => {
               />
             </div>
             <div>
-              <label htmlFor="email" className="sr-only">Email address</label>
+              <label htmlFor="email" className="sr-only">
+                Email address
+              </label>
               <input
                 id="email"
                 name="email"
@@ -85,7 +89,9 @@ const Register = () => {
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">Password</label>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
               <input
                 id="password"
                 name="password"
@@ -98,15 +104,25 @@ const Register = () => {
                 placeholder="Password"
               />
             </div>
-            <div className="hidden">
-              <label htmlFor="role" className="sr-only">Role</label>
-              <input
+
+            {/* Role selection */}
+            <div>
+              <label
+                htmlFor="role"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Role
+              </label>
+              <select
                 id="role"
                 name="role"
-                type="text"
                 value={userData.role}
-                readOnly
-              />
+                onChange={handleChange}
+                className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              >
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
             </div>
           </div>
 
@@ -121,8 +137,18 @@ const Register = () => {
               ) : (
                 <>
                   <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                    <svg className="h-5 w-5 text-blue-500 group-hover:text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    <svg
+                      className="h-5 w-5 text-blue-500 group-hover:text-blue-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </span>
                   Register
@@ -131,11 +157,14 @@ const Register = () => {
             </button>
           </div>
         </form>
-        
+
         <div className="text-center text-sm">
           <p className="text-gray-600">
-            Already have an account?{' '}
-            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="font-medium text-blue-600 hover:text-blue-500"
+            >
               Sign in here
             </Link>
           </p>

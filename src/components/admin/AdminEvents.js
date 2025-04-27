@@ -13,8 +13,6 @@ const AdminEvents = () => {
     error,
   } = useAdmin();
 
-  console.log("Admin loadin", isLoadingEvents);
-
   useEffect(() => {
     fetchAdminEvents();
   }, []);
@@ -26,9 +24,6 @@ const AdminEvents = () => {
   };
 
   const serverUrl = "http://localhost:4000";
-
-  if (isLoadingEvents) return <LoadingSpinner />;
-  if (error) return <ErrorAlert message={error} />;
 
   return (
     <div>

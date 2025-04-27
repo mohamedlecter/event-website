@@ -17,6 +17,7 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
   });
 
   const [previewImage, setPreviewImage] = useState(event?.image || null);
+  const [dateError, setDateError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -25,6 +26,19 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
       ...prev,
       [name]: value,
     }));
+
+    // Check if the new date is in the past
+    if (name === "date") {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Set today's time to 00:00:00 for comparison
+
+      if (selectedDate < today) {
+        setDateError("Event date cannot be in the past.");
+      } else {
+        setDateError("");
+      }
+    }
   };
 
   const handleFileChange = (e) => {
@@ -45,6 +59,11 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Prevent submission if there's a date error
+    if (dateError) {
+      return;
+    }
 
     const eventData = {
       title: formData.title,
@@ -149,6 +168,9 @@ const EventForm = ({ event, onSubmit, onCancel }) => {
                   required
                   className="w-full p-2 border rounded-md"
                 />
+                {dateError && (
+                  <div className="text-red-500 text-sm mt-2">{dateError}</div>
+                )}
               </div>
 
               <div>

@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from "react";
 import {
   getDashboardStats,
-  fetchEvents,
+  getAdminEvents,
   fetchAllPayments,
   getEventAnalytics,
   deleteEvent,
@@ -40,7 +40,7 @@ export const AdminProvider = ({ children }) => {
   const fetchAdminEvents = async () => {
     setIsLoadingEvents(true);
     try {
-      const data = await fetchEvents(token);
+      const data = await getAdminEvents(token);
       setAdminEvents(data);
     } catch (err) {
       setError(err.message);
@@ -54,6 +54,7 @@ export const AdminProvider = ({ children }) => {
     try {
       const data = await fetchAllPayments(token);
       setPayments(data);
+      console.log("Payments data:", data); // Debugging line
     } catch (err) {
       setError(err.message);
     } finally {

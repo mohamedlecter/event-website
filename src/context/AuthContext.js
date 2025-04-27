@@ -49,9 +49,9 @@ export const AuthProvider = ({ children }) => {
       setToken(token);
       setUser(user);
 
-      console.log("User logged in:", user);
-      navigate(user.role === "admin" ? "/admin" : "/events");
-      return { success: true };
+      console.log("User logged in:", user.role);
+
+      return { success: true, user }; // Return user for the page to handle redirect
     } catch (err) {
       setError(err.message);
       return { success: false, error: err.message };
@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", token);
       setToken(token);
       setUser(user);
-      navigate("/events");
+      navigate("/events"); // Redirect to events page after successful registration
       return { success: true };
     } catch (err) {
       setError(err.message);
@@ -76,6 +76,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);
+    navigate("/"); // Move user back to homepage
   };
 
   return (
