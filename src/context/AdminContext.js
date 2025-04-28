@@ -42,6 +42,7 @@ export const AdminProvider = ({ children }) => {
     try {
       const data = await getAdminEvents(token);
       setAdminEvents(data);
+      console.log("Admin Events data:", data); // Debugging line
     } catch (err) {
       setError(err.message);
     } finally {
@@ -66,6 +67,7 @@ export const AdminProvider = ({ children }) => {
     setIsLoadingAnalytics(true);
     try {
       const data = await getEventAnalytics(eventId, token);
+      console.log("Event Analytics data:", data); // Debugging line
       setAnalytics(data);
       return data;
     } catch (err) {

@@ -43,11 +43,11 @@ export const fetchUserTickets = async (token) => {
   return response.data;
 };
 
-export const transferTicket = async (ticketId, recipientEmail, token) => {
+export const transferTicket = async (ticketId, recipientMobileNumber, token) => {
   setAuthHeader(token);
   const response = await axios.put(
     `${API_URL}/events/tickets/${ticketId}/transfer`,
-    { recipientEmail }
+    { recipientMobileNumber }
   );
   return response.data;
 };

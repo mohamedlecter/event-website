@@ -14,10 +14,13 @@ const EventAnalytics = () => {
     error,
   } = useAdmin();
 
+
   useEffect(() => {
     fetchEventAnalytics(eventId);
     // intentionally not adding fetchEventAnalytics to deps
   }, [eventId]);
+  console.log('EventAnalytics', analytics);
+
 
   if (isLoadingAnalytics) return <LoadingSpinner />;
   if (error) return <ErrorAlert message={error} />;

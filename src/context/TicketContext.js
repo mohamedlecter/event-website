@@ -17,6 +17,9 @@ export const TicketProvider = ({ children }) => {
     try {
       const result = await searchTickets(reference, token);
       setTicket(result);
+      console.log("Search result:", result); // Debugging line
+      console.log(ticket);
+      
     } catch (err) {
       setTicket(null);
       setError(err.message || "Failed to search ticket.");
@@ -31,6 +34,7 @@ export const TicketProvider = ({ children }) => {
     try {
       const result = await scanTicket(ticketId, token);
       setTicket(result); // Update the current ticket with new scanned status
+      console.log("Scanned ticket:", result); // Debugging line
     } catch (err) {
       setError(err.message || "Failed to scan ticket.");
     } finally {

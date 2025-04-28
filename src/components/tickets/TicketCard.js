@@ -4,19 +4,19 @@ import LoadingSpinner from '../ui/LoadingSpinner';
 
 const TicketCard = ({ ticket }) => {
   const [showTransferForm, setShowTransferForm] = useState(false);
-  const [recipientEmail, setRecipientEmail] = useState('');
+  const [recipientMobileNumber, setRecipientMobileNumber] = useState('');
   const [isTransferring, setIsTransferring] = useState(false);
   const { transferUserTicket } = useEvents();
 
   const handleTransfer = async (e) => {
     e.preventDefault();
-    if (!recipientEmail) return;
+    if (!recipientMobileNumber) return;
     
     setIsTransferring(true);
     try {
-      await transferUserTicket(ticket._id, recipientEmail);
+      await transferUserTicket(ticket._id, recipientMobileNumber);
       setShowTransferForm(false);
-      setRecipientEmail('');
+      setRecipientMobileNumber('');
     } finally {
       setIsTransferring(false);
     }
@@ -59,7 +59,7 @@ const TicketCard = ({ ticket }) => {
           
           <div className="text-sm">
             <p className="text-gray-600">
-              <span className="font-medium">Recipient:</span> {ticket.recipientEmail}
+              <span className="font-medium">Recipient:</span> {ticket.recipientMobileNumber}
             </p>
             <p className="text-gray-600">
               <span className="font-medium">Reference:</span> {ticket.reference}
@@ -91,19 +91,20 @@ const TicketCard = ({ ticket }) => {
         <div className="mt-4 pt-4 border-t">
           <form onSubmit={handleTransfer} className="flex flex-col sm:flex-row gap-2">
             <input
-              type="email"
-              value={recipientEmail}
-              onChange={(e) => setRecipientEmail(e.target.value)}
+              type="mobile"
+              value={recipientMobileNumber}
+              onChange={(e) => setRecipientMobileNumber(e.target.value)}
               placeholder="Recipient email"
               className="flex-1 p-2 border rounded-md"
               required
+              typeof='Number'
             />
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => {
                   setShowTransferForm(false);
-                  setRecipientEmail('');
+                  setRecipientMobileNumber('');
                 }}
                 className="px-3 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
                 disabled={isTransferring}

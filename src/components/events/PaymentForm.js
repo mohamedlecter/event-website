@@ -5,7 +5,7 @@ import ErrorAlert from '../ui/ErrorAlert';
 
 const PaymentForm = ({ event, ticketType, onClose }) => {
   const [quantity, setQuantity] = useState(1);
-  const [recipientEmails, setRecipientEmails] = useState(['']);
+  const [recipientMobileNumbers, setRecipientMobileNumbers] = useState(['']);
   const [paymentInitiated, setPaymentInitiated] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState('');
   const { purchaseTickets, isLoading, error } = useEvents();
@@ -14,22 +14,21 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
     const newQuantity = parseInt(e.target.value);
     setQuantity(newQuantity);
     
-    // Adjust recipient emails array
-    if (newQuantity > recipientEmails.length) {
-      const newEmails = [...recipientEmails];
-      while (newEmails.length < newQuantity) {
-        newEmails.push('');
+    if (newQuantity > recipientMobileNumbers.length) {
+      const newMobileNumbers = [...recipientMobileNumbers];
+      while (newMobileNumbers.length < newQuantity) {
+        newMobileNumbers.push('');
       }
-      setRecipientEmails(newEmails);
-    } else if (newQuantity < recipientEmails.length) {
-      setRecipientEmails(recipientEmails.slice(0, newQuantity));
+      setRecipientMobileNumbers(newMobileNumbers);
+    } else if (newQuantity < recipientMobileNumbers.length) {
+      setRecipientMobileNumbers(recipientMobileNumbers.slice(0, newQuantity));
     }
   };
 
-  const handleEmailChange = (index, value) => {
-    const newEmails = [...recipientEmails];
-    newEmails[index] = value;
-    setRecipientEmails(newEmails);
+  const handleNumberChange = (index, value) => {
+    const newMobileNumbers = [...recipientMobileNumbers];
+    newMobileNumbers[index] = value;
+    setRecipientMobileNumbers(newMobileNumbers);
   };
 
   const handleSubmit = async (e) => {
@@ -38,7 +37,7 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
       const paymentData = await purchaseTickets(event._id, {
         ticketType,
         quantity,
-        recipientEmails,
+        recipientMobileNumbers,
       });
       
       setPaymentInitiated(true);
@@ -93,14 +92,14 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
             </div>
             
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Recipient Email(s)</label>
-              {recipientEmails.map((email, index) => (
+              <label className="block text-gray-700 mb-2">Recipient Mobile Number(s)</label>
+              {recipientMobileNumbers.map((number, index) => (
                 <input
                   key={index}
-                  type="email"
-                  value={email}
-                  onChange={(e) => handleEmailChange(index, e.target.value)}
-                  placeholder={`Recipient ${index + 1} email`}
+                  type="tel"
+                  value={number}
+                  onChange={(e) => handleNumberChange(index, e.target.value)}
+                  placeholder={`Recipient ${index + 1} mobile number`}
                   className="w-full p-2 border rounded-md mb-2"
                   required
                 />

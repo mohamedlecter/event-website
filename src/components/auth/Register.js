@@ -9,7 +9,8 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
-    role: "user", // Default to 'user'
+    role: "user", // Default to 'user',
+    mobileNumber: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -28,6 +29,8 @@ const Register = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
+
+    console.log("Registering user with data:", userData);
 
     try {
       const result = await register(userData);
@@ -71,6 +74,23 @@ const Register = () => {
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Full Name"
               />
+            </div>
+            <div>
+              <label htmlFor="mobileNumber" className="sr-only">
+                Mobile Number
+              </label>
+              <input
+                id="mobileNumber"
+                name="mobileNumber"
+                type="tel"
+                autoComplete="tel"
+                required
+                value={userData.mobileNumber}
+                onChange={handleChange}
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                placeholder="Mobile Number"
+              />
+
             </div>
             <div>
               <label htmlFor="email" className="sr-only">
