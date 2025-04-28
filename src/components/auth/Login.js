@@ -59,7 +59,7 @@ const Login = () => {
           </h2>
         </div>
 
-        {error && <ErrorAlert message={error} />}
+        {error && <ErrorAlert message={error + ", Incorrect credentials "} />}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
