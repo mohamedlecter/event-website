@@ -14,16 +14,16 @@ const PaymentSuccess = () => {
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
-    const reference = query.get("reference");
+    const sessionId = query.get("session_id");
 
-    if (!reference) {
+    if (!sessionId) {
       navigate("/events");
       return;
     }
 
     const verifyPayment = async () => {
       try {
-        const paymentData = await confirmPayment(reference);
+        const paymentData = await confirmPayment(sessionId);
         setPayment(paymentData);
       } catch (err) {
         setError(err.message);
@@ -34,7 +34,7 @@ const PaymentSuccess = () => {
 
     verifyPayment();
   }, [location.search]);
-
+  
   if (isLoading) return <LoadingSpinner />;
 
   console.log(payment);

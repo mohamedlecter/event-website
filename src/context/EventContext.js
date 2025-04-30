@@ -69,12 +69,12 @@ export const EventProvider = ({ children }) => {
     setFilteredEvents(results);
   };
 
-  const purchaseTickets = async (eventId, ticketData) => {
+  const purchaseTickets = async (eventId, paymentData) => {
     setIsLoading(true);
-    const token = localStorage.getItem("token"); // Or however you store the token
+    const token = localStorage.getItem("token");
     try {
-      const paymentData = await initiatePayment(eventId, ticketData, token); // Pass token here
-      return paymentData;
+      const response = await initiatePayment(eventId, paymentData, token); 
+      return response;
     } catch (err) {
       setError(err.message);
       throw err;
@@ -82,7 +82,7 @@ export const EventProvider = ({ children }) => {
       setIsLoading(false);
     }
   };
-
+  
   const confirmPayment = async (reference) => {
     setIsLoading(true);
     const token = localStorage.getItem("token"); // Or however you store the token
