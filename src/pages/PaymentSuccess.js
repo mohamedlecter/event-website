@@ -1,30 +1,37 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEvents } from "../context/EventContext";
-import LoadingSpinner from "../components/ui/LoadingSpinner";
-import ErrorAlert from "../components/ui/ErrorAlert";
+import { verifyPayment } from "../../services/paymentService";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 const PaymentSuccess = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { confirmPayment } = useEvents();
-  const [payment, setPayment] = useState(null);
+  const [paymentDetails, setPaymentDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const query = new URLSearchParams(location.search);
-    const sessionId = query.get("session_id");
-
-    if (!sessionId) {
-      navigate("/events");
-      return;
-    }
-
-    const verifyPayment = async () => {
+    const verify = async () => {
       try {
-        const paymentData = await confirmPayment(sessionId);
-        setPayment(paymentData);
+        const searchParams = new URLSearchParams(location.search);
+        const sessionId = searchParams.get("session_id");
+        const reference = searchParams.get("reference");
+
+        let response;
+        if (sessionId) {
+          // Stripe verification
+          response = await verifyPayment({
+            session_id: sessionId,
+            gateway: "stripe",
+          });
+        } else if (reference) {
+          // Wave verification
+          response = await verifyPayment({ reference, gateway: "wave" });
+        } else {
+          throw new Error("No payment reference found");
+        }
+
+        setPaymentDetails(response.payment);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -32,100 +39,69 @@ const PaymentSuccess = () => {
       }
     };
 
-    verifyPayment();
+    verify();
   }, [location.search]);
-  
+
   if (isLoading) return <LoadingSpinner />;
 
-  console.log(payment);
+  if (error) {
+    return (
+      <div className="max-w-2xl mx-auto p-4">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <p>Payment verification failed: {error}</p>
+        </div>
+        <button
+          onClick={() => navigate("/events")}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Browse Events
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-        {error ? (
-          <div className="p-6">
-            <ErrorAlert message={error} />
-            <button
-              onClick={() => navigate("/events")}
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-            >
-              Back to Events
-            </button>
-          </div>
-        ) : payment ? (
-          <div className="p-6">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold mb-2">Payment Successful!</h2>
-              <p className="text-gray-600">
-                Your tickets have been purchased successfully.
-              </p>
-            </div>
+    <div className="max-w-2xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Payment Successful!</h1>
 
-            <div className="border-t pt-6">
-              <h3 className="font-medium mb-4">Order Details</h3>
+      {paymentDetails && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-2">Order Details</h2>
+          <p className="mb-1">
+            <strong>Event:</strong> {paymentDetails.event.title}
+          </p>
+          <p className="mb-1">
+            <strong>Amount:</strong> ${paymentDetails.amount.toFixed(2)}
+          </p>
+          <p className="mb-1">
+            <strong>Reference:</strong> {paymentDetails.reference}
+          </p>
 
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Event:</span>
-                  <span className="font-medium">
-                    {payment.payment.event.title}
-                  </span>
-                </div>
+          <h3 className="text-lg font-semibold mt-4 mb-2">Tickets</h3>
+          <ul className="space-y-2">
+            {paymentDetails.tickets.map((ticket) => (
+              <li key={ticket._id} className="border-b pb-2">
+                <p>
+                  <strong>Type:</strong> {ticket.ticketType.toUpperCase()}
+                </p>
+                <p>
+                  <strong>Recipient:</strong> {ticket.recipientMobileNumber}
+                </p>
+                <p>
+                  <strong>Ticket Reference:</strong> {ticket.reference}
+                </p>
+              </li>
+            ))}
+          </ul>
 
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Amount Paid:</span>
-                  <span className="font-medium">${payment.payment.amount}</span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Reference:</span>
-                  <span className="font-medium">
-                    {payment.payment.reference}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Date:</span>
-                  <span className="font-medium">
-                    {new Date(payment.payment.createdAt).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 flex justify-between">
-              <button
-                onClick={() => navigate("/events")}
-                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
-              >
-                Browse More Events
-              </button>
-              <button
-                onClick={() => navigate("/my-tickets")}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                View My Tickets
-              </button>
-            </div>
-          </div>
-        ) : null}
-      </div>
+          <button
+            onClick={() => navigate("/my-tickets")}
+            className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            View My Tickets
+          </button>
+        </div>
+      )}
     </div>
   );
 };
