@@ -49,24 +49,22 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
       const response = await purchaseTickets(event._id.toString(), paymentData);
 
       if (paymentGateway === "stripe") {
-        // Redirect to Stripe Checkout
         const stripe = await stripePromise;
         const { error } = await stripe.redirectToCheckout({
           sessionId: response.id,
         });
-
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
       } else if (paymentGateway === "wave") {
         // Redirect to Wave payment page
-        window.location.href = response.paymentUrl;
+        window.location.href = response.wave_launch_url;
       }
     } catch (err) {
       console.error("Payment initiation failed:", err);
       setIsProcessing(false);
     }
   };
+
+  const currency = paymentGateway === "wave" ? "XOF" : "USD";
 
   if (isLoading || isProcessing) return <LoadingSpinner />;
 
@@ -93,9 +91,15 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
               onChange={(e) => setPaymentGateway(e.target.value)}
               className="w-full p-2 border rounded-md mb-4"
             >
-              <option value="stripe">Stripe</option>
-              <option value="wave">Wave</option>
+              <option value="stripe">Stripe (Credit Card)</option>
+              <option value="wave">Wave Mobile Money</option>
             </select>
+            {paymentGateway === "wave" && (
+              <div className="text-sm text-gray-600 mt-2">
+                <p>• Payments processed in XOF</p>
+                <p>• Requires Wave mobile app</p>
+              </div>
+            )}
           </div>
 
           <div className="mb-4">
@@ -136,14 +140,14 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
               <p>
                 {quantity} x {ticketType === "vip" ? "VIP" : "Standard"} Ticket:
                 <span className="font-bold ml-2">
-                  $
+                  {currency}{" "}
                   {ticketType === "vip"
                     ? event.vipTicket.price
                     : event.standardTicket.price}
                 </span>
               </p>
               <p className="mt-2 font-bold">
-                Total: $
+                Total: {currency}{" "}
                 {(ticketType === "vip"
                   ? event.vipTicket.price
                   : event.standardTicket.price) * quantity}

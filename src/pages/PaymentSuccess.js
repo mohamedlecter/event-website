@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { verifyPayment } from "../../services/paymentService";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import { verifyPayment } from "../services/eventService";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 const PaymentSuccess = () => {
   const location = useLocation();
@@ -16,20 +16,15 @@ const PaymentSuccess = () => {
         const searchParams = new URLSearchParams(location.search);
         const sessionId = searchParams.get("session_id");
         const reference = searchParams.get("reference");
+        const gateway = searchParams.get("gateway");
 
-        let response;
-        if (sessionId) {
-          // Stripe verification
-          response = await verifyPayment({
-            session_id: sessionId,
-            gateway: "stripe",
-          });
-        } else if (reference) {
-          // Wave verification
-          response = await verifyPayment({ reference, gateway: "wave" });
-        } else {
-          throw new Error("No payment reference found");
-        }
+        if (!gateway) throw new Error("Missing payment gateway parameter");
+
+        const response = await verifyPayment({
+          [gateway === "stripe" ? "session_id" : "reference"]:
+            gateway === "stripe" ? sessionId : reference,
+          gateway,
+        });
 
         setPaymentDetails(response.payment);
       } catch (err) {

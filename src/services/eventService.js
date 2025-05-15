@@ -28,21 +28,30 @@ export const initiatePayment = async (eventId, paymentData, token) => {
       paymentData,
       {
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       }
     );
     return response.data;
   } catch (error) {
-    console.error('Payment initiation error:', error);
+    console.error("Payment initiation error:", error);
     throw error;
   }
 };
-export const verifyPayment = async (sessionId, token) => {
+// eventService.js (updated verifyPayment)
+export const verifyPayment = async (paymentData, token) => {
   setAuthHeader(token);
-  const response = await axios.post(`${API_URL}/events/verify-payment`, { session_id: sessionId });
-  return response.data;
-}
+  try {
+    const response = await axios.post(
+      `${API_URL}/events/verify-payment`,
+      paymentData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Payment verification error:", error);
+    throw error;
+  }
+};
 
 export const fetchUserTickets = async (token) => {
   setAuthHeader(token);
@@ -50,7 +59,11 @@ export const fetchUserTickets = async (token) => {
   return response.data;
 };
 
-export const transferTicket = async (ticketId, recipientMobileNumber, token) => {
+export const transferTicket = async (
+  ticketId,
+  recipientMobileNumber,
+  token
+) => {
   setAuthHeader(token);
   const response = await axios.put(
     `${API_URL}/events/tickets/${ticketId}/transfer`,

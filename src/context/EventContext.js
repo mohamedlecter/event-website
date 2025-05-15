@@ -73,7 +73,7 @@ export const EventProvider = ({ children }) => {
     setIsLoading(true);
     const token = localStorage.getItem("token");
     try {
-      const response = await initiatePayment(eventId, paymentData, token); 
+      const response = await initiatePayment(eventId, paymentData, token);
       return response;
     } catch (err) {
       setError(err.message);
@@ -82,12 +82,13 @@ export const EventProvider = ({ children }) => {
       setIsLoading(false);
     }
   };
-  
-  const confirmPayment = async (reference) => {
+
+  // EventContext.js (updated confirmPayment)
+  const confirmPayment = async (paymentData) => {
     setIsLoading(true);
-    const token = localStorage.getItem("token"); // Or however you store the token
+    const token = localStorage.getItem("token");
     try {
-      const payment = await verifyPayment(reference, token);
+      const payment = await verifyPayment(paymentData, token);
       return payment;
     } catch (err) {
       setError(err.message);
