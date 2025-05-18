@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { verifyPayment } from "../../services/paymentService";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import { verifyPayment } from "../services/eventService";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
+
 
 const PaymentSuccess = () => {
   const location = useLocation();
