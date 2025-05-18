@@ -23,7 +23,7 @@ const PaymentSuccess = () => {
           // Stripe verification
           response = await verifyPayment({
             session_id: sessionId,
-            gateway: "stripe",
+            gateway: "stripe", // thats the issue 
           });
         } else if (reference) {
           // Wave verification
