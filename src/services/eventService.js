@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
-// const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4000/api";
+const API_URL = process.env.REACT_APP_API_URL || 'http://54.252.242.131:4000/api';
+// const API_URL = process.env.REACT_APP_API_URL || "http://54.252.242.131:4000/api";
 
 const setAuthHeader = (token) => {
   if (token) {
@@ -73,7 +73,7 @@ export const createEvent = async (eventData) => {
   }
 
   const response = await axios.post(
-    "http://localhost:4000/api/events/",
+    "http://54.252.242.131:4000/api/events/",
     formData,
     {
       headers: {
