@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
-const API_URL = process.env.REACT_APP_API_URL || "http://54.252.242.131:4000/api";
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
+// const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4000/api";
 
 const setAuthHeader = (token) => {
   if (token) {
@@ -39,9 +39,12 @@ export const initiatePayment = async (eventId, paymentData, token) => {
     throw error;
   }
 };
-export const verifyPayment = async (sessionId, token) => {
+export const verifyPayment = async (reference, gateway, token) => {
   setAuthHeader(token);
-  const response = await axios.post(`${API_URL}/events/verify-payment`, { session_id: sessionId, token });
+  const response = await axios.post(`${API_URL}/events/verify-payment`, { 
+    reference,
+    gateway 
+  });
   return response.data;
 }
 
@@ -70,7 +73,7 @@ export const createEvent = async (eventData) => {
   }
 
   const response = await axios.post(
-    "http://54.252.242.131:4000/api/events/",
+    "http://localhost:4000/api/events/",
     formData,
     {
       headers: {

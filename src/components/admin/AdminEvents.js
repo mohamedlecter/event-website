@@ -24,7 +24,7 @@ const AdminEvents = () => {
   };
 
   // const serverUrl = "http://localhost:4000";
-  const serverUrl = "http://54.252.242.131:4000";
+  const serverUrl = "http://localhost:4000";
   
 
   console.log("Events error:", error);

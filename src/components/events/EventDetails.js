@@ -21,7 +21,7 @@ const EventDetails = () => {
 
   const event = selectedEvent;
   // const serverUrl = "http://localhost:4000";
-  const serverUrl = "http://54.252.242.131:4000";
+  const serverUrl = "http://localhost:4000";
 
   if (isLoading || !event) return <LoadingSpinner />;
 

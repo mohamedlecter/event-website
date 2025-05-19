@@ -83,11 +83,14 @@ export const EventProvider = ({ children }) => {
     }
   };
   
-  const confirmPayment = async (reference) => {
+  const confirmPayment = async (sessionId, gateway) => {
     setIsLoading(true);
-    const token = localStorage.getItem("token"); // Or however you store the token
+    const token = localStorage.getItem("token");
+    console.log("sessionId:", sessionId)
     try {
-      const payment = await verifyPayment(reference, token);
+      const payment = await verifyPayment(
+        sessionId, gateway , token
+      );
       return payment;
     } catch (err) {
       setError(err.message);
@@ -99,7 +102,7 @@ export const EventProvider = ({ children }) => {
 
   const getUserTickets = async () => {
     setIsLoading(true);
-    const token = localStorage.getItem("token"); // Or however you store the token
+    const token = localStorage.getItem("token"); 
     try {
       const data = await fetchUserTickets(token);
       setTickets(data);

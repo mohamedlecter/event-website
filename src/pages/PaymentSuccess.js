@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { verifyPayment } from "../services/eventService";
+import { useEvents } from "../context/EventContext";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
-
 
 const PaymentSuccess = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [paymentDetails, setPaymentDetails] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isVerifying, setIsVerifying] = useState(true);
+  const { confirmPayment, isLoading } = useEvents();
 
   useEffect(() => {
     const verify = async () => {
@@ -18,32 +18,29 @@ const PaymentSuccess = () => {
         const sessionId = searchParams.get("session_id");
         const reference = searchParams.get("reference");
 
-        let response;
-        if (sessionId) {
-          // Stripe verification
-          response = await verifyPayment({
-            session_id: sessionId,
-            gateway: "stripe", // thats the issue 
-          });
-        } else if (reference) {
-          // Wave verification
-          response = await verifyPayment({ reference, gateway: "wave" });
-        } else {
+        if (!sessionId && !reference) {
           throw new Error("No payment reference found");
         }
+
+        const response = await confirmPayment(
+          sessionId || reference,
+          sessionId ? "stripe" : "wave"
+        );
 
         setPaymentDetails(response.payment);
       } catch (err) {
         setError(err.message);
       } finally {
-        setIsLoading(false);
+        setIsVerifying(false);
       }
     };
 
-    verify();
-  }, [location.search]);
+    if (isVerifying) {
+      verify();
+    }
+  }, [location.search, confirmPayment, isVerifying]);
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading || isVerifying) return <LoadingSpinner />;
 
   if (error) {
     return (
