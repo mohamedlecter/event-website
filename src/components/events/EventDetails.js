@@ -20,8 +20,8 @@ const EventDetails = () => {
   }, [id]);
 
   const event = selectedEvent;
-  // const serverUrl = "http://54.252.242.131:4000";
-  const serverUrl = "http://54.252.242.131:4000";
+  // const serverUrl = "http://3.107.6.176:4000";
+  const serverUrl = "http://3.107.6.176:4000";
 
   if (isLoading || !event) return <LoadingSpinner />;
 

@@ -23,9 +23,8 @@ const AdminEvents = () => {
     await removeEvent(eventId);
   };
 
-  // const serverUrl = "http://54.252.242.131:4000";
-  const serverUrl = "http://54.252.242.131:4000";
-  
+  // const serverUrl = "http://3.107.6.176:4000";
+  const serverUrl = "http://3.107.6.176:4000";
 
   console.log("Events error:", error);
 
