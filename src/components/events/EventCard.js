@@ -7,8 +7,9 @@ const EventCard = ({ event }) => {
 
   console.log(event);
 
-  const serverUrl = "http://localhost:4000";
-
+  // const serverUrl = "http://54.252.242.131:4000";
+  const serverUrl = "http://54.252.242.131:4000";
+  
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
       <Link to={`/events/${event._id}`}>

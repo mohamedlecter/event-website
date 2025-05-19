@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4000/api";
+const API_URL =
+  process.env.REACT_APP_API_URL || "http://54.252.242.131:4000/api";
+// const API_URL = process.env.REACT_APP_API_URL || "http://54.252.242.131:4000/api";
 
 const setAuthHeader = (token) => {
   if (token) {
@@ -38,19 +40,13 @@ export const initiatePayment = async (eventId, paymentData, token) => {
     throw error;
   }
 };
-// eventService.js (updated verifyPayment)
-export const verifyPayment = async (paymentData, token) => {
+export const verifyPayment = async (reference, gateway, token) => {
   setAuthHeader(token);
-  try {
-    const response = await axios.post(
-      `${API_URL}/events/verify-payment`,
-      paymentData
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Payment verification error:", error);
-    throw error;
-  }
+  const response = await axios.post(`${API_URL}/events/verify-payment`, {
+    reference,
+    gateway,
+  });
+  return response.data;
 };
 
 export const fetchUserTickets = async (token) => {
@@ -82,7 +78,7 @@ export const createEvent = async (eventData) => {
   }
 
   const response = await axios.post(
-    "http://localhost:4000/api/events/",
+    "http://54.252.242.131:4000/api/events/",
     formData,
     {
       headers: {
