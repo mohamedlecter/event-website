@@ -1,91 +1,138 @@
-import axios from "axios";
-
-const API_URL = process.env.REACT_APP_API_URL || "http://3.107.6.176:4000/api";
-// const API_URL = process.env.REACT_APP_API_URL || "http://3.107.6.176:4000/api";
-
-const setAuthHeader = (token) => {
-  if (token) {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  } else {
-    delete axios.defaults.headers.common["Authorization"];
-  }
-};
+import apiClient from './apiClient';
 
 export const fetchEvents = async (filters = {}) => {
-  const response = await axios.get(`${API_URL}/events`, { params: filters });
-  return response.data;
-};
-
-export const fetchEventDetails = async (id) => {
-  const response = await axios.get(`${API_URL}/events/${id}`);
-  return response.data;
-};
-
-export const initiatePayment = async (eventId, paymentData, token) => {
-  setAuthHeader(token);
   try {
-    const response = await axios.post(
-      `${API_URL}/events/${eventId}/pay`,
-      paymentData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await apiClient.get('/events', { params: filters });
     return response.data;
   } catch (error) {
-    console.error("Payment initiation error:", error);
+    console.error('Error fetching events:', error);
     throw error;
   }
 };
-export const verifyPayment = async (reference, gateway, token) => {
-  setAuthHeader(token);
-  const response = await axios.post(`${API_URL}/events/verify-payment`, {
-    reference,
-    gateway,
-  });
-  return response.data;
+
+export const fetchEventDetails = async (id) => {
+  try {
+    const response = await apiClient.get(`/events/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching event details for ID ${id}:`, error);
+    throw error;
+  }
 };
 
-export const fetchUserTickets = async (token) => {
-  setAuthHeader(token);
-  const response = await axios.get(`${API_URL}/events/user/tickets`);
-  return response.data;
+export const initiatePayment = async (eventId, paymentData) => {
+  try {
+    // Ensure eventId is a string
+    const eventIdStr = eventId.toString();
+    
+    // Format the payment data according to backend expectations
+    const formattedPaymentData = {
+      ticketType: paymentData.ticketType,
+      quantity: paymentData.quantity,
+      recipientType: paymentData.recipientType,
+      recipientInfo: paymentData.recipientInfo.map(info => ({
+        type: paymentData.recipientType,
+        value: info,
+        name: info
+      })),
+      paymentGateway: paymentData.paymentGateway,
+      metadata: {
+        eventId: eventIdStr,
+        eventTitle: paymentData.metadata.eventTitle,
+        ticketType: paymentData.ticketType,
+        quantity: paymentData.quantity.toString()
+      }
+    };
+
+    const response = await apiClient.post(`/events/${eventIdStr}/pay`, formattedPaymentData);
+    return response.data;
+  } catch (error) {
+    console.error('Payment initiation error:', error);
+    throw error;
+  }
 };
 
-export const transferTicket = async (
-  ticketId,
-  recipientMobileNumber,
-  token
-) => {
-  setAuthHeader(token);
-  const response = await axios.put(
-    `${API_URL}/events/tickets/${ticketId}/transfer`,
-    { recipientMobileNumber }
-  );
-  return response.data;
+export const verifyPayment = async (reference, gateway) => {
+  try {
+    const response = await apiClient.post('/events/verify-payment', {
+      reference,
+      gateway,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Payment verification error:', error);
+    throw error;
+  }
+};
+
+export const fetchUserTickets = async () => {
+  try {
+    const response = await apiClient.get('/events/user/tickets');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user tickets:', error);
+    throw error;
+  }
+};
+
+export const transferTicket = async (ticketId, transferData) => {
+  try {
+    const response = await apiClient.put(
+      `/events/tickets/${ticketId}/transfer`,
+      transferData
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Ticket transfer error:', error);
+    throw error;
+  }
 };
 
 export const createEvent = async (eventData) => {
-  const token = localStorage.getItem("token"); // Or your auth method
-  const formData = new FormData();
-
-  // Since image upload is involved, we use FormData
-  for (const key in eventData) {
-    formData.append(key, eventData[key]);
-  }
-
-  const response = await axios.post(
-    "http://3.107.6.176:4000/api/events/",
-    formData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
+  try {
+    const formData = new FormData();
+    for (const key in eventData) {
+      formData.append(key, eventData[key]);
     }
-  );
 
-  return response.data;
+    const response = await apiClient.post('/events/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error creating event:', error);
+    throw error;
+  }
+};
+
+export const sendTransferNotification = async (transferData) => {
+  try {
+    const response = await apiClient.post('/events/tickets/notify-transfer', transferData);
+    return response.data;
+  } catch (error) {
+    console.error('Error sending transfer notification:', error);
+    throw error;
+  }
+};
+
+export const getTransferHistory = async (ticketId) => {
+  try {
+    const response = await apiClient.get(`/events/tickets/${ticketId}/transfer-history`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching transfer history:', error);
+    throw error;
+  }
+};
+
+export const cancelTransfer = async (ticketId) => {
+  try {
+    const response = await apiClient.post(`/events/tickets/${ticketId}/cancel-transfer`);
+    return response.data;
+  } catch (error) {
+    console.error('Error canceling transfer:', error);
+    throw error;
+  }
 };

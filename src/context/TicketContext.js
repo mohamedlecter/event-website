@@ -9,37 +9,45 @@ export const TicketProvider = ({ children }) => {
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState(null);
 
-  const token = localStorage.getItem("token");
-
   const handleSearchTicket = async (reference) => {
+    if (!reference) {
+      setError("Please enter a ticket reference number.");
+      return;
+    }
+
     setIsSearching(true);
     setError(null);
     try {
-      const result = await searchTickets(reference, token);
+      const result = await searchTickets(reference);
       setTicket(result);
-      console.log("Search result:", result); // Debugging line
-      console.log(ticket);
-      
     } catch (err) {
       setTicket(null);
-      setError(err.message || "Failed to search ticket.");
+      setError(err.response?.data?.message || err.message || "Failed to search ticket. Please try again.");
     } finally {
       setIsSearching(false);
     }
   };
 
   const handleScanTicket = async (ticketId) => {
+    if (!ticketId) {
+      setError("Invalid ticket ID.");
+      return;
+    }
+
     setIsScanning(true);
     setError(null);
     try {
-      const result = await scanTicket(ticketId, token);
-      setTicket(result); // Update the current ticket with new scanned status
-      console.log("Scanned ticket:", result); // Debugging line
+      const result = await scanTicket(ticketId);
+      setTicket(result);
     } catch (err) {
-      setError(err.message || "Failed to scan ticket.");
+      setError(err.response?.data?.message || err.message || "Failed to scan ticket. Please try again.");
     } finally {
       setIsScanning(false);
     }
+  };
+
+  const clearError = () => {
+    setError(null);
   };
 
   return (
@@ -51,6 +59,7 @@ export const TicketProvider = ({ children }) => {
         error,
         handleSearchTicket,
         handleScanTicket,
+        clearError
       }}
     >
       {children}

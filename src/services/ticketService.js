@@ -1,24 +1,29 @@
-import axios from "axios";
-
-// const API_URL = process.env.REACT_APP_API_URL || 'http://3.107.6.176:4000/api';
-const API_URL = process.env.REACT_APP_API_URL || "http://3.107.6.176:4000";
+import apiClient from './apiClient';
 
 const setAuthHeader = (token) => {
   if (token) {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
-    delete axios.defaults.headers.common["Authorization"];
+    delete apiClient.defaults.headers.common["Authorization"];
   }
 };
 
-export const searchTickets = async (reference, token) => {
-  setAuthHeader(token);
-  const response = await axios.get(`${API_URL}/admin/tickets/${reference}`);
-  return response.data;
+export const searchTickets = async (reference) => {
+  try {
+    const response = await apiClient.get(`/admin/tickets/${reference}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error searching tickets:', error);
+    throw error;
+  }
 };
 
-export const scanTicket = async (ticketId, token) => {
-  setAuthHeader(token);
-  const response = await axios.put(`${API_URL}/admin/tickets/${ticketId}/scan`);
-  return response.data;
+export const scanTicket = async (ticketId) => {
+  try {
+    const response = await apiClient.put(`/admin/tickets/${ticketId}/scan`);
+    return response.data;
+  } catch (error) {
+    console.error('Error scanning ticket:', error);
+    throw error;
+  }
 };

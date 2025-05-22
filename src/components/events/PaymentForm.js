@@ -9,22 +9,37 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 const PaymentForm = ({ event, ticketType, onClose }) => {
   const [quantity, setQuantity] = useState(1);
   const [recipientMobileNumbers, setRecipientMobileNumbers] = useState([""]);
+  const [recipientEmails, setRecipientEmails] = useState([""]);
+  const [recipientType, setRecipientType] = useState("mobile");
   const [paymentGateway, setPaymentGateway] = useState("stripe");
   const [isProcessing, setIsProcessing] = useState(false);
-  const { purchaseTickets, isLoading, error } = useEvents();
+  const [error, setError] = useState(null);
+  const { purchaseTickets, isLoading } = useEvents();
+
+  const maxTickets = Math.min(
+    ticketType === "vip" 
+      ? event.vipTicket.quantity - event.vipTicket.sold
+      : event.standardTicket.quantity - event.standardTicket.sold,
+    100 // Set a reasonable maximum limit
+  );
 
   const handleQuantityChange = (e) => {
-    const newQuantity = parseInt(e.target.value);
-    setQuantity(newQuantity);
+    const newQuantity = parseInt(e.target.value) || 1;
+    const validQuantity = Math.min(Math.max(1, newQuantity), maxTickets);
+    setQuantity(validQuantity);
 
-    if (newQuantity > recipientMobileNumbers.length) {
+    if (validQuantity > recipientMobileNumbers.length) {
       const newMobileNumbers = [...recipientMobileNumbers];
-      while (newMobileNumbers.length < newQuantity) {
+      const newEmails = [...recipientEmails];
+      while (newMobileNumbers.length < validQuantity) {
         newMobileNumbers.push("");
+        newEmails.push("");
       }
       setRecipientMobileNumbers(newMobileNumbers);
-    } else if (newQuantity < recipientMobileNumbers.length) {
-      setRecipientMobileNumbers(recipientMobileNumbers.slice(0, newQuantity));
+      setRecipientEmails(newEmails);
+    } else if (validQuantity < recipientMobileNumbers.length) {
+      setRecipientMobileNumbers(recipientMobileNumbers.slice(0, validQuantity));
+      setRecipientEmails(recipientEmails.slice(0, validQuantity));
     }
   };
 
@@ -34,37 +49,109 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
     setRecipientMobileNumbers(newMobileNumbers);
   };
 
+  const handleEmailChange = (index, value) => {
+    const newEmails = [...recipientEmails];
+    newEmails[index] = value;
+    setRecipientEmails(newEmails);
+  };
+
+  const validateForm = () => {
+    if (!event?._id) {
+      setError("Invalid event data. Please try again.");
+      return false;
+    }
+
+    if (!ticketType) {
+      setError("Please select a ticket type.");
+      return false;
+    }
+
+    if (quantity < 1) {
+      setError("Please select at least one ticket.");
+      return false;
+    }
+
+    if (recipientType === "mobile") {
+      // Validate mobile numbers
+      for (let i = 0; i < recipientMobileNumbers.length; i++) {
+        const number = recipientMobileNumbers[i];
+        if (!number || !/^[0-9]{10}$/.test(number)) {
+          setError(`Please enter a valid 10-digit mobile number for recipient ${i + 1}.`);
+          return false;
+        }
+      }
+    } else {
+      // Validate emails
+      for (let i = 0; i < recipientEmails.length; i++) {
+        const email = recipientEmails[i];
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          setError(`Please enter a valid email address for recipient ${i + 1}.`);
+          return false;
+        }
+      }
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsProcessing(true);
+    setError(null);
 
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsProcessing(true);
     try {
+      const eventIdStr = event._id.toString();
       const paymentData = {
         ticketType,
         quantity,
-        recipientMobileNumbers,
+        recipientType,
+        recipientInfo: recipientType === "email" 
+          ? recipientEmails 
+          : recipientMobileNumbers,
         paymentGateway,
+        metadata: {
+          eventId: eventIdStr,
+          eventTitle: event.title,
+          ticketType: ticketType,
+          quantity: quantity.toString()
+        }
       };
 
-      const response = await purchaseTickets(event._id.toString(), paymentData);
+      const response = await purchaseTickets(eventIdStr, paymentData);
 
       if (paymentGateway === "stripe") {
         const stripe = await stripePromise;
+        if (!stripe) {
+          throw new Error("Stripe failed to load. Please try again.");
+        }
+
         const { error } = await stripe.redirectToCheckout({
           sessionId: response.id,
         });
-        if (error) throw error;
+        
+        if (error) {
+          throw error;
+        }
       } else if (paymentGateway === "wave") {
-        // Redirect to Wave payment page
+        if (!response.wave_launch_url) {
+          throw new Error("Wave payment URL not received.");
+        }
         window.location.href = response.wave_launch_url;
       }
     } catch (err) {
       console.error("Payment initiation failed:", err);
+      setError(err.message || "Failed to initiate payment. Please try again.");
       setIsProcessing(false);
     }
   };
 
   const currency = paymentGateway === "wave" ? "XOF" : "USD";
+  const ticketPrice = ticketType === "vip" ? event.vipTicket.price : event.standardTicket.price;
+  const totalAmount = ticketPrice * quantity;
 
   if (isLoading || isProcessing) return <LoadingSpinner />;
 
@@ -90,6 +177,7 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
               value={paymentGateway}
               onChange={(e) => setPaymentGateway(e.target.value)}
               className="w-full p-2 border rounded-md mb-4"
+              disabled={isProcessing}
             >
               <option value="stripe">Stripe (Credit Card)</option>
               <option value="wave">Wave Mobile Money</option>
@@ -104,54 +192,105 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
 
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">Quantity</label>
+            <div className="flex items-center space-x-2">
+              <button
+                type="button"
+                onClick={() => handleQuantityChange({ target: { value: quantity - 1 } })}
+                disabled={quantity <= 1 || isProcessing}
+                className="p-2 border rounded-md hover:bg-gray-50 disabled:opacity-50"
+              >
+                -
+              </button>
+              <input
+                type="number"
+                value={quantity}
+                onChange={handleQuantityChange}
+                min="1"
+                max={maxTickets}
+                className="w-20 p-2 border rounded-md text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                disabled={isProcessing}
+              />
+              <button
+                type="button"
+                onClick={() => handleQuantityChange({ target: { value: quantity + 1 } })}
+                disabled={quantity >= maxTickets || isProcessing}
+                className="p-2 border rounded-md hover:bg-gray-50 disabled:opacity-50"
+              >
+                +
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 mt-1">
+              {maxTickets} tickets available
+            </p>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700 mb-2">Recipient Type</label>
             <select
-              value={quantity}
-              onChange={handleQuantityChange}
-              className="w-full p-2 border rounded-md"
+              value={recipientType}
+              onChange={(e) => setRecipientType(e.target.value)}
+              className="w-full p-2 border rounded-md mb-4"
+              disabled={isProcessing}
             >
-              {[...Array(10).keys()].map((num) => (
-                <option key={num + 1} value={num + 1}>
-                  {num + 1}
-                </option>
-              ))}
+              <option value="mobile">Mobile Number</option>
+              <option value="email">Email Address</option>
             </select>
           </div>
 
           <div className="mb-4">
             <label className="block text-gray-700 mb-2">
-              Recipient Mobile Number(s)
+              {recipientType === "mobile" ? "Recipient Mobile Number(s)" : "Recipient Email(s)"}
             </label>
-            {recipientMobileNumbers.map((number, index) => (
-              <input
-                key={index}
-                type="tel"
-                value={number}
-                onChange={(e) => handleNumberChange(index, e.target.value)}
-                placeholder={`Recipient ${index + 1} mobile number`}
-                className="w-full p-2 border rounded-md mb-2"
-                required
-              />
-            ))}
+            <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
+              {recipientType === "mobile" ? (
+                recipientMobileNumbers.map((number, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <span className="text-gray-500 w-8">{index + 1}.</span>
+                    <input
+                      type="tel"
+                      value={number}
+                      onChange={(e) => handleNumberChange(index, e.target.value)}
+                      placeholder={`Recipient ${index + 1} mobile number`}
+                      className="flex-1 p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                      pattern="[0-9]{10}"
+                      title="Please enter a valid 10-digit mobile number"
+                      disabled={isProcessing}
+                    />
+                  </div>
+                ))
+              ) : (
+                recipientEmails.map((email, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <span className="text-gray-500 w-8">{index + 1}.</span>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => handleEmailChange(index, e.target.value)}
+                      placeholder={`Recipient ${index + 1} email address`}
+                      className="flex-1 p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                      pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
+                      title="Please enter a valid email address"
+                      disabled={isProcessing}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
           </div>
 
           <div className="mb-4">
-            <h4 className="font-semibold">Order Summary</h4>
-            <div className="mt-2">
-              <p>
-                {quantity} x {ticketType === "vip" ? "VIP" : "Standard"} Ticket:
-                <span className="font-bold ml-2">
-                  {currency}{" "}
-                  {ticketType === "vip"
-                    ? event.vipTicket.price
-                    : event.standardTicket.price}
-                </span>
-              </p>
-              <p className="mt-2 font-bold">
-                Total: {currency}{" "}
-                {(ticketType === "vip"
-                  ? event.vipTicket.price
-                  : event.standardTicket.price) * quantity}
-              </p>
+            <h4 className="font-semibold mb-2">Order Summary</h4>
+            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+              <div className="flex justify-between">
+                <span>{quantity} x {ticketType === "vip" ? "VIP" : "Standard"} Ticket</span>
+                <span className="font-medium">{currency} {ticketPrice}</span>
+              </div>
+              <div className="border-t pt-2 flex justify-between">
+                <span className="font-bold">Total</span>
+                <span className="font-bold">{currency} {totalAmount}</span>
+              </div>
             </div>
           </div>
 
@@ -160,6 +299,7 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
               type="button"
               onClick={onClose}
               className="px-4 py-2 border rounded-md hover:bg-gray-100"
+              disabled={isProcessing}
             >
               Cancel
             </button>

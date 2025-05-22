@@ -1,24 +1,31 @@
-import axios from "axios";
-
-// const API_URL = process.env.REACT_APP_API_URL || "http://3.107.6.176:4000/api";
-const API_URL = process.env.REACT_APP_API_URL || "http://3.107.6.176:4000/api";
+import apiClient from './apiClient';
 
 export const loginUser = async (credentials) => {
-  console.log("Sending login to:", `${API_URL}/auth/login`);
-  console.log("Credentials:", credentials);
-
-  const response = await axios.post(`${API_URL}/auth/login`, credentials);
-  return response.data;
+  try {
+    const response = await apiClient.post('/auth/login', credentials);
+    return response.data;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
 };
 
 export const registerUser = async (userData) => {
-  const response = await axios.post(`${API_URL}/auth/register`, userData);
-  return response.data;
+  try {
+    const response = await apiClient.post('/auth/register', userData);
+    return response.data;
+  } catch (error) {
+    console.error('Registration error:', error);
+    throw error;
+  }
 };
 
-export const getCurrentUser = async (token) => {
-  const response = await axios.get(`${API_URL}/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
+export const getCurrentUser = async () => {
+  try {
+    const response = await apiClient.get('/auth/me');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+    throw error;
+  }
 };

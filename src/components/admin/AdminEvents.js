@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAdmin } from "../../context/AdminContext";
+import { getServerUrl } from "../../config/env";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";
 
@@ -12,6 +13,7 @@ const AdminEvents = () => {
     isLoadingEvents,
     error,
   } = useAdmin();
+  const serverUrl = getServerUrl();
 
   useEffect(() => {
     fetchAdminEvents();
@@ -22,9 +24,6 @@ const AdminEvents = () => {
 
     await removeEvent(eventId);
   };
-
-  // const serverUrl = "http://3.107.6.176:4000";
-  const serverUrl = "http://3.107.6.176:4000";
 
   console.log("Events error:", error);
 

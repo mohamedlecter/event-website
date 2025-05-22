@@ -1,48 +1,59 @@
-import axios from "axios";
-// const API_URL = process.env.REACT_APP_API_URL || 'http://3.107.6.176:4000/api';
-const API_URL = process.env.REACT_APP_API_URL || "http://3.107.6.176:4000/api";
-
-export const getDashboardStats = async (token) => {
-  const response = await axios.get(`${API_URL}/admin/dashboard`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
+import apiClient from './apiClient';
+export const getDashboardStats = async () => {
+  try {
+    const response = await apiClient.get('/admin/dashboard');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    throw error;
+  }
 };
 
-export const fetchEvents = async (token) => {
-  const response = await axios.get(`${API_URL}/events`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
+export const fetchEvents = async () => {
+  try {
+    const response = await apiClient.get('/events');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    throw error;
+  }
 };
 
-export const fetchAllPayments = async (token) => {
-  console.log("Token in localStorage: ", token); // Log token to check
-  const response = await axios.get(`${API_URL}/admin/payments`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
+export const fetchAllPayments = async () => {
+  try {
+    const response = await apiClient.get('/admin/payments');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching payments:', error);
+    throw error;
+  }
 };
 
-export const getEventAnalytics = async (eventId, token) => {
-  const response = await axios.get(
-    `${API_URL}/admin/events/${eventId}/analytics`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-  return response.data;
+export const getEventAnalytics = async (eventId) => {
+  try {
+    const response = await apiClient.get(`/admin/events/${eventId}/analytics`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching analytics for event ${eventId}:`, error);
+    throw error;
+  }
 };
 
-export const deleteEvent = async (eventId, token) => {
-  console.log("Deleting event with ID:", eventId); // Debugging line
-  console.log("Using token:", token); // Debugging line
-  await axios.delete(`${API_URL}/events/${eventId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export const deleteEvent = async (eventId) => {
+  try {
+    await apiClient.delete(`/events/${eventId}`);
+  } catch (error) {
+    console.error(`Error deleting event ${eventId}:`, error);
+    throw error;
+  }
 };
 
-export const getAdminEvents = async (token) => {
-  const response = await axios.get(`${API_URL}/admin/events`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
+export const getAdminEvents = async () => {
+  try {
+    const response = await apiClient.get('/admin/events');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching admin events:', error);
+    throw error;
+  }
 };
