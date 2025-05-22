@@ -20,13 +20,15 @@ export const EventProvider = ({ children }) => {
 
   const getEvents = async (filters = {}) => {
     setIsLoading(true);
+    setError(null);
     try {
       const data = await fetchEvents(filters);
       setEvents(data);
       setFilteredEvents(data);
       return data;
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to fetch events. Please try again later.");
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -34,12 +36,14 @@ export const EventProvider = ({ children }) => {
 
   const getEventDetails = async (id) => {
     setIsLoading(true);
+    setError(null);
     try {
       const data = await fetchEventDetails(id);
       setSelectedEvent(data);
       return data;
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to fetch event details. Please try again later.");
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -48,22 +52,74 @@ export const EventProvider = ({ children }) => {
   const filterEvents = (filters) => {
     let results = [...events];
 
+    // Category filter
     if (filters.category) {
       results = results.filter((event) => event.category === filters.category);
     }
 
+    // Search filter
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
       results = results.filter(
         (event) =>
           event.title.toLowerCase().includes(searchTerm) ||
-          event.description.toLowerCase().includes(searchTerm)
+          event.description.toLowerCase().includes(searchTerm) ||
+          event.location.city.toLowerCase().includes(searchTerm) ||
+          event.location.country.toLowerCase().includes(searchTerm)
       );
     }
 
+    // Upcoming filter
     if (filters.upcoming) {
       const now = new Date();
       results = results.filter((event) => new Date(event.date) > now);
+    }
+
+    // Price range filter
+    if (filters.priceRange && filters.priceRange !== 'all') {
+      results = results.filter((event) => {
+        const price = event.standardTicket.price;
+        switch (filters.priceRange) {
+          case 'free':
+            return price === 0;
+          case 'under50':
+            return price < 50;
+          case 'under100':
+            return price < 100;
+          case 'over100':
+            return price >= 100;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Date range filter
+    if (filters.dateRange && filters.dateRange !== 'all') {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const nextWeek = new Date(today);
+      nextWeek.setDate(nextWeek.getDate() + 7);
+      const nextMonth = new Date(today);
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+      results = results.filter((event) => {
+        const eventDate = new Date(event.date);
+        switch (filters.dateRange) {
+          case 'today':
+            return eventDate >= today && eventDate < tomorrow;
+          case 'tomorrow':
+            return eventDate >= tomorrow && eventDate < new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
+          case 'thisWeek':
+            return eventDate >= today && eventDate < nextWeek;
+          case 'thisMonth':
+            return eventDate >= today && eventDate < nextMonth;
+          default:
+            return true;
+        }
+      });
     }
 
     setFilteredEvents(results);
@@ -71,12 +127,13 @@ export const EventProvider = ({ children }) => {
 
   const purchaseTickets = async (eventId, paymentData) => {
     setIsLoading(true);
+    setError(null);
     const token = localStorage.getItem("token");
     try {
       const response = await initiatePayment(eventId, paymentData, token);
       return response;
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to process payment. Please try again later.");
       throw err;
     } finally {
       setIsLoading(false);
@@ -85,13 +142,13 @@ export const EventProvider = ({ children }) => {
 
   const confirmPayment = async (sessionId, gateway) => {
     setIsLoading(true);
+    setError(null);
     const token = localStorage.getItem("token");
-    console.log("sessionId:", sessionId);
     try {
       const payment = await verifyPayment(sessionId, gateway, token);
       return payment;
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to confirm payment. Please try again later.");
       throw err;
     } finally {
       setIsLoading(false);
@@ -100,15 +157,15 @@ export const EventProvider = ({ children }) => {
 
   const getUserTickets = async () => {
     setIsLoading(true);
+    setError(null);
     const token = localStorage.getItem("token");
     try {
       const data = await fetchUserTickets(token);
       setTickets(data);
-      console.log("tickets", data);
-
       return data;
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to fetch tickets. Please try again later.");
+      throw err;
     } finally {
       setIsLoading(false);
     }
@@ -116,6 +173,7 @@ export const EventProvider = ({ children }) => {
 
   const transferUserTicket = async (ticketId, recipientMobileNumber) => {
     setIsLoading(true);
+    setError(null);
     const token = localStorage.getItem("token");
     try {
       const data = await transferTicket(ticketId, recipientMobileNumber, token);
@@ -124,7 +182,7 @@ export const EventProvider = ({ children }) => {
       );
       return data;
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to transfer ticket. Please try again later.");
       throw err;
     } finally {
       setIsLoading(false);
