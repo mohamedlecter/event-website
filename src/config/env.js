@@ -6,9 +6,9 @@ const ENV = {
     STRIPE_KEY: process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY
   },
   production: {
-    API_URL: 'http://3.107.6.176:4000/api',
-    UPLOAD_URL: 'http://3.107.6.176:4000/uploads',
-    SERVER_URL: 'http://3.107.6.176:4000',
+    API_URL: 'http://13.238.120.129:4000/api',
+    UPLOAD_URL: 'http://13.238.120.129:4000/uploads',
+    SERVER_URL: 'http://13.238.120.129:4000',
     STRIPE_KEY: process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY
   }
 };
