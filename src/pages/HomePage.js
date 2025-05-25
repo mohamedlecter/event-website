@@ -17,9 +17,9 @@ const Home = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Discover Amazing Events</h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Find and book tickets for the best events in your city. Concerts, sports, arts and more!
+        <h1 className="text-2xl font-bold mb-4">One Platform. Every Ticket. Your Ticket to Everything – Anytime, Anywhere.</h1>
+        <p className="text   text-gray-600 max-w-2xl mx-auto">
+        Buy and manage tickets for events, travel, and entertainment with ease. 100% digital. No lines. No stress.Book, scan, and go in seconds.
         </p>
       </div>
       

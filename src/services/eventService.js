@@ -25,32 +25,14 @@ export const initiatePayment = async (eventId, paymentData) => {
     // Ensure eventId is a string
     const eventIdStr = eventId.toString();
     
-    // Format the payment data according to backend expectations
-    const formattedPaymentData = {
-      ticketType: paymentData.ticketType,
-      quantity: paymentData.quantity,
-      recipientType: paymentData.recipientType,
-      recipientInfo: paymentData.recipientInfo.map(info => ({
-        type: paymentData.recipientType,
-        value: info,
-        name: info
-      })),
-      paymentGateway: paymentData.paymentGateway,
-      metadata: {
-        eventId: eventIdStr,
-        eventTitle: paymentData.metadata.eventTitle,
-        ticketType: paymentData.ticketType,
-        quantity: paymentData.quantity.toString()
-      }
-    };
-
-    const response = await apiClient.post(`/events/${eventIdStr}/pay`, formattedPaymentData);
+    // The payment data is already formatted correctly in the PaymentForm component
+    const response = await apiClient.post(`/events/${eventIdStr}/pay`, paymentData);
     return response.data;
   } catch (error) {
     console.error('Payment initiation error:', error);
     throw error;
   }
-};
+}; 
 
 export const verifyPayment = async (reference, gateway) => {
   try {

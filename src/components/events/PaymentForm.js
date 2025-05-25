@@ -75,8 +75,8 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
       // Validate mobile numbers
       for (let i = 0; i < recipientMobileNumbers.length; i++) {
         const number = recipientMobileNumbers[i];
-        if (!number || !/^[0-9]{10}$/.test(number)) {
-          setError(`Please enter a valid 10-digit mobile number for recipient ${i + 1}.`);
+        if (!number || !/^[0-9]{7}$/.test(number)) {
+          setError(`Please enter a valid 7-digit mobile number for recipient ${i + 1}.`);
           return false;
         }
       }
@@ -105,13 +105,23 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
     setIsProcessing(true);
     try {
       const eventIdStr = event._id.toString();
+      const recipientInfo = recipientType === "email" 
+        ? recipientEmails.map(email => ({
+            type: "email",
+            value: email,
+            name: email
+          }))
+        : recipientMobileNumbers.map(number => ({
+            type: "mobile",
+            value: number,
+            name: number
+          }));
+
       const paymentData = {
         ticketType,
         quantity,
         recipientType,
-        recipientInfo: recipientType === "email" 
-          ? recipientEmails 
-          : recipientMobileNumbers,
+        recipientInfo,
         paymentGateway,
         metadata: {
           eventId: eventIdStr,
@@ -147,9 +157,9 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
       setError(err.message || "Failed to initiate payment. Please try again.");
       setIsProcessing(false);
     }
-  };
+  }; 
 
-  const currency = paymentGateway === "wave" ? "XOF" : "USD";
+  const currency = paymentGateway === "wave" ? "GMD " : "USD";
   const ticketPrice = ticketType === "vip" ? event.vipTicket.price : event.standardTicket.price;
   const totalAmount = ticketPrice * quantity;
 
@@ -184,7 +194,7 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
             </select>
             {paymentGateway === "wave" && (
               <div className="text-sm text-gray-600 mt-2">
-                <p>• Payments processed in XOF</p>
+                <p>• Payments processed in GMD </p>
                 <p>• Requires Wave mobile app</p>
               </div>
             )}
@@ -253,8 +263,8 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
                       placeholder={`Recipient ${index + 1} mobile number`}
                       className="flex-1 p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
-                      pattern="[0-9]{10}"
-                      title="Please enter a valid 10-digit mobile number"
+                      pattern="[0-9]{7}"
+                      title="Please enter a valid 7-digit mobile number"
                       disabled={isProcessing}
                     />
                   </div>

@@ -23,9 +23,14 @@ export const registerUser = async (userData) => {
 export const getCurrentUser = async () => {
   try {
     const response = await apiClient.get('/auth/me');
+    console.log('Current user response:', response.data); 
     return response.data;
   } catch (error) {
     console.error('Error fetching current user:', error);
     throw error;
   }
+};
+export const refreshToken = async (refreshToken) => {
+  const response = await apiClient.post('/auth/refresh', { refreshToken });
+  return response.data;
 };

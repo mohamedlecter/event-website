@@ -25,6 +25,7 @@ const Login = () => {
       [name]: value,
     }));
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -171,4 +172,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Login

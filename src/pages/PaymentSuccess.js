@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEvents } from "../context/EventContext";
+import { useAuth } from "../context/AuthContext";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 const PaymentSuccess = () => {
@@ -10,10 +11,23 @@ const PaymentSuccess = () => {
   const [error, setError] = useState(null);
   const [isVerifying, setIsVerifying] = useState(true);
   const { confirmPayment, isLoading } = useEvents();
+  const { isAuthenticated, checkAuth } = useAuth();
 
   useEffect(() => {
     const verify = async () => {
       try {
+        // First check if user is authenticated
+        const isAuth = await checkAuth();
+        
+        if (!isAuth) {
+          // If not authenticated, redirect to login with return URL
+          const returnUrl = encodeURIComponent(location.pathname + location.search);
+          navigate(`/login?returnUrl=${returnUrl}`, { 
+            state: { from: { pathname: location.pathname + location.search } }
+          });
+          return;
+        }
+
         const searchParams = new URLSearchParams(location.search);
         const sessionId = searchParams.get("session_id");
         const reference = searchParams.get("reference");
@@ -23,14 +37,38 @@ const PaymentSuccess = () => {
           throw new Error("No payment reference found");
         }
 
-        const response = await confirmPayment(
-          sessionId || reference,
-          sessionId ? "stripe" : "wave"
-        );
-
-        setPaymentDetails(response.payment);
+        // Add retry logic for payment verification
+        let retryCount = 0;
+        const maxRetries = 3;
+        
+        while (retryCount < maxRetries) {
+          try {
+            const response = await confirmPayment(
+              sessionId || reference,
+              sessionId ? "stripe" : "wave"
+            );
+            setPaymentDetails(response.payment);
+            break;
+          } catch (err) {
+            retryCount++;
+            if (retryCount === maxRetries) {
+              throw err;
+            }
+            // Wait for 2 seconds before retrying
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
+        }
       } catch (err) {
-        setError(err.message);
+        console.error("Payment verification error:", err);
+        if (err.response?.status === 401) {
+          // If unauthorized, redirect to login
+          const returnUrl = encodeURIComponent(location.pathname + location.search);
+          navigate(`/login?returnUrl=${returnUrl}`, { 
+            state: { from: { pathname: location.pathname + location.search } }
+          });
+        } else {
+          setError(err.message || "Failed to verify payment. Please try again.");
+        }
       } finally {
         setIsVerifying(false);
       }
@@ -39,7 +77,7 @@ const PaymentSuccess = () => {
     if (isVerifying) {
       verify();
     }
-  }, [location.search, confirmPayment, isVerifying]);
+  }, [location.search, confirmPayment, isVerifying, checkAuth, navigate]);
 
   if (isLoading || isVerifying) return <LoadingSpinner />;
 
@@ -84,7 +122,7 @@ const PaymentSuccess = () => {
                   <strong>Type:</strong> {ticket.ticketType.toUpperCase()}
                 </p>
                 <p>
-                  <strong>Recipient:</strong> {ticket.recipientMobileNumber}
+                  <strong>Recipient:</strong> {ticket.recipientInfo?.value || 'N/A'}
                 </p>
                 <p>
                   <strong>Ticket Reference:</strong> {ticket.reference}
@@ -105,4 +143,4 @@ const PaymentSuccess = () => {
   );
 };
 
-export default PaymentSuccess;
+export default PaymentSuccess; 

@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   loginUser,
   registerUser,
@@ -15,43 +15,70 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // Enhanced token validation
+  const validateToken = useCallback((token) => {
+    try {
+      if (!token) return false;
+      const decoded = jwtDecode(token);
+      const isValid = decoded.exp * 1000 > Date.now();
+      return isValid;
+    } catch (err) {
+      console.error("Token validation error:", err);
+      return false;
+    }
+  }, []);
+
+  // Enhanced authentication check
+  const checkAuth = useCallback(async () => {
+    try {
+      if (!token) return false;
+
+      // Check if current token is valid
+      if (validateToken(token)) {
+        const currentUser = await getCurrentUser(token);
+        setUser(currentUser);
+        return true;
+      }
+
+      // If token is invalid, log out
+      logout();
+      return false;
+    } catch (err) {
+      console.error("Auth check failed:", err);
+      logout();
+      return false;
+    }
+  }, [token, validateToken]);
+
+  // Initial auth check
   useEffect(() => {
-    const checkAuth = async () => {
+    const initializeAuth = async () => {
       try {
-        console.log("Checking authentication...");
-        if (token) {
-          const decoded = jwtDecode(token);
-          console.log("Decoded token:", decoded);
-          if (decoded.exp * 1000 < Date.now()) {
-            logout();
-            return;
-          }
-          const currentUser = await getCurrentUser(token);
-          console.log("Fetched user:", currentUser);
-          setUser(currentUser);
-        }
+        await checkAuth();
       } catch (err) {
-        console.error("Authentication error:", err);
-        logout();
+        console.error("Initial auth check failed:", err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkAuth();
-  }, [token]);
+    initializeAuth();
+  }, [token, checkAuth]);
 
   const login = async (credentials) => {
     try {
-      const { token, user } = await loginUser(credentials);
-      localStorage.setItem("token", token);
-      setToken(token);
+      const { token: newToken, user } = await loginUser(credentials);
+      localStorage.setItem("token", newToken);
+      setToken(newToken);
       setUser(user);
+      setError(null);
 
-      console.log("User logged in:", user.role);
-
-      return { success: true, user }; // Return user for the page to handle redirect
+      const params = new URLSearchParams(location.search);
+      const returnUrl = params.get('returnUrl') || location.state?.from?.pathname || "/events";
+      navigate(returnUrl, { replace: true });
+      return { success: true, user };
     } catch (err) {
       setError(err.message);
       return { success: false, error: err.message };
@@ -60,11 +87,12 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const { token, user } = await registerUser(userData);
-      localStorage.setItem("token", token);
-      setToken(token);
+      const { token: newToken, user } = await registerUser(userData);
+      localStorage.setItem("token", newToken);
+      setToken(newToken);
       setUser(user);
-      navigate("/events"); // Redirect to events page after successful registration
+      setError(null);
+      navigate("/events");
       return { success: true };
     } catch (err) {
       setError(err.message);
@@ -72,12 +100,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);
-    navigate("/"); // Move user back to homepage
-  };
+    setError(null);
+    navigate("/");
+  }, [navigate]);
 
   return (
     <AuthContext.Provider
@@ -89,7 +118,8 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        isAuthenticated: !!token,
+        checkAuth,
+        isAuthenticated: !!token && validateToken(token),
         isAdmin: user?.role === "admin",
       }}
     >
