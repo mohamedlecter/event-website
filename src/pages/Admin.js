@@ -68,7 +68,7 @@ const Admin = () => {
                   : "text-gray-700 hover:bg-gray-200"
               }`
             }
-            onClick={() => setSidebarOpen(false)} // close sidebar on link click (mobile)
+            onClick={() => setSidebarOpen(false)}
           >
             Dashboard
           </NavLink>

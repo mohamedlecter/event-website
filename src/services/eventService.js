@@ -73,19 +73,35 @@ export const transferTicket = async (ticketId, transferData) => {
 export const createEvent = async (eventData) => {
   try {
     const formData = new FormData();
-    for (const key in eventData) {
-      formData.append(key, eventData[key]);
+    
+    // Add basic event data
+    formData.append('title', eventData.title);
+    formData.append('description', eventData.description);
+    formData.append('country', eventData.country);
+    formData.append('city', eventData.city);
+    formData.append('standardPrice', eventData.standardPrice);
+    formData.append('standardQuantity', eventData.standardQuantity);
+    formData.append('vipPrice', eventData.vipPrice);
+    formData.append('vipQuantity', eventData.vipQuantity);
+    formData.append('date', eventData.date);
+    formData.append('category', eventData.category.toLowerCase());
+
+    // Add image if it exists
+    if (eventData.image instanceof File) {
+      formData.append('image', eventData.image);
     }
 
-    const response = await apiClient.post('/events/', formData, {
+    const response = await apiClient.post('/events', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
     return response.data;
   } catch (error) {
-    console.error('Error creating event:', error);
-    throw error;
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error('Failed to create event. Please try again.');
   }
 };
 
