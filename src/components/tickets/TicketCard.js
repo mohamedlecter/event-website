@@ -136,9 +136,9 @@ const TicketCard = ({ ticket }) => {
   const getTicketTypeColor = (type) => {
     switch (type) {
       case 'vip':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
+        return 'bg-[#FBA415]/10 text-[#FBA415] border-[#FBA415]/20';
       case 'standard':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-[#FBA415]/10 text-[#FBA415] border-[#FBA415]/20';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -155,16 +155,16 @@ const TicketCard = ({ ticket }) => {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="font-bold text-xl mb-1">{ticket.event.title}</h3>
-              <span className={`px-2 py-1 rounded-full text-xs ${getTicketTypeColor(ticket.ticketType)}`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getTicketTypeColor(ticket.ticketType)}`}>
                 {ticket.ticketType.toUpperCase()}
               </span>
             </div>
-            <span className={`px-3 py-1 rounded-full text-sm ${
+            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
               eventStatus.color === 'gray' 
                 ? 'bg-gray-100 text-gray-800'
                 : eventStatus.color === 'green'
                 ? 'bg-green-100 text-green-800'
-                : 'bg-blue-100 text-blue-800'
+                : 'bg-[#FBA415]/10 text-[#FBA415]'
             }`}>
               {eventStatus.text}
             </span>
@@ -197,7 +197,7 @@ const TicketCard = ({ ticket }) => {
         <div className="flex flex-col items-center gap-4">
           <button
             onClick={() => setShowQRCode(!showQRCode)}
-            className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-[#FBA415] hover:text-[#FBA415]/80 transition-colors"
             aria-label={showQRCode ? "Hide QR Code" : "Show QR Code"}
           >
             {showQRCode ? "Hide QR" : "Show QR"}
@@ -209,7 +209,7 @@ const TicketCard = ({ ticket }) => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className="p-2 bg-white rounded-lg shadow-sm"
+                className="p-4 bg-white rounded-lg shadow-sm border border-gray-100"
               >
                 <QRCodeSVG
                   value={`${ticket.reference}-${ticket._id}`}
@@ -226,12 +226,12 @@ const TicketCard = ({ ticket }) => {
       <div className="mt-6 pt-4 border-t flex justify-between items-center">
         <div className="flex items-center gap-2">
           {ticket.transferred && (
-            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+            <span className="text-xs bg-[#FBA415]/10 text-[#FBA415] px-3 py-1 rounded-full font-medium">
               Transferred
             </span>
           )}
           {isToday && (
-            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+            <span className="text-xs bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
               Event Today
             </span>
           )}
@@ -241,20 +241,20 @@ const TicketCard = ({ ticket }) => {
           {isUpcoming && !ticket.transferred && (
             <button
               onClick={() => setShowTransferForm(true)}
-              className="px-4 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+              className="px-4 py-2 text-sm text-[#FBA415] hover:text-[#FBA415]/80 font-medium transition-colors"
             >
               Transfer Ticket
             </button>
           )}
           <button
             onClick={() => setShowTransferHistory(!showTransferHistory)}
-            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
+            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors"
           >
             {showTransferHistory ? 'Hide History' : 'Show History'}
           </button>
           <button
             onClick={() => window.print()}
-            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
+            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors"
           >
             Print Ticket
           </button>
@@ -273,7 +273,7 @@ const TicketCard = ({ ticket }) => {
             {transferHistory.length > 0 ? (
               <div className="space-y-3">
                 {transferHistory.map((transfer, index) => (
-                  <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                  <div key={index} className="bg-gray-50 p-4 rounded-lg">
                     <div className="flex justify-between items-start">
                       <div>
                         <p className="text-sm text-gray-600">
@@ -290,7 +290,7 @@ const TicketCard = ({ ticket }) => {
                         <button
                           onClick={handleCancelTransfer}
                           disabled={isCancelling}
-                          className="text-sm text-red-600 hover:text-red-800"
+                          className="text-sm text-red-600 hover:text-red-800 transition-colors"
                         >
                           {isCancelling ? <LoadingSpinner small /> : 'Cancel'}
                         </button>
@@ -330,7 +330,7 @@ const TicketCard = ({ ticket }) => {
                   <select
                     value={transferType}
                     onChange={(e) => setTransferType(e.target.value)}
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#FBA415] focus:border-[#FBA415]"
                   >
                     <option value="mobile">Mobile Number</option>
                     <option value="email">Email Address</option>
@@ -345,7 +345,7 @@ const TicketCard = ({ ticket }) => {
                     value={recipientName}
                     onChange={(e) => setRecipientName(e.target.value)}
                     placeholder="Enter recipient's name"
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#FBA415] focus:border-[#FBA415]"
                   />
                 </div>
               </div>
@@ -359,7 +359,7 @@ const TicketCard = ({ ticket }) => {
                   value={recipientValue}
                   onChange={(e) => setRecipientValue(e.target.value)}
                   placeholder={`Enter recipient's ${transferType === 'mobile' ? 'mobile number' : 'email'}`}
-                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#FBA415] focus:border-[#FBA415]"
                   required
                   pattern={transferType === 'mobile' ? '[0-9]{10}' : undefined}
                   title={transferType === 'mobile' ? 'Please enter a valid 10-digit mobile number' : undefined}
@@ -374,14 +374,14 @@ const TicketCard = ({ ticket }) => {
                     setRecipientValue('');
                     setRecipientName('');
                   }}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   disabled={isTransferring}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-[#FBA415] text-gray-900 rounded-lg hover:bg-[#FBA415]/90 transition-colors disabled:opacity-50"
                   disabled={isTransferring}
                 >
                   {isTransferring ? <LoadingSpinner small /> : 'Transfer Ticket'}

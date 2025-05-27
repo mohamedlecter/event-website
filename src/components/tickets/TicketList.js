@@ -46,7 +46,7 @@ const TicketList = ({ tickets }) => {
           <button
             className={`px-4 py-2 relative ${
               activeTab === "all"
-                ? "text-blue-600"
+                ? "text-[#FBA415]"
                 : "text-gray-500 hover:text-gray-700"
             }`}
             onClick={() => setActiveTab("all")}
@@ -56,14 +56,14 @@ const TicketList = ({ tickets }) => {
             {activeTab === "all" && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FBA415]"
               />
             )}
           </button>
           <button
             className={`px-4 py-2 relative ${
               activeTab === "upcoming"
-                ? "text-blue-600"
+                ? "text-[#FBA415]"
                 : "text-gray-500 hover:text-gray-700"
             }`}
             onClick={() => setActiveTab("upcoming")}
@@ -73,14 +73,14 @@ const TicketList = ({ tickets }) => {
             {activeTab === "upcoming" && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FBA415]"
               />
             )}
           </button>
           <button
             className={`px-4 py-2 relative ${
               activeTab === "past"
-                ? "text-blue-600"
+                ? "text-[#FBA415]"
                 : "text-gray-500 hover:text-gray-700"
             }`}
             onClick={() => setActiveTab("past")}
@@ -90,7 +90,7 @@ const TicketList = ({ tickets }) => {
             {activeTab === "past" && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FBA415]"
               />
             )}
           </button>
@@ -102,7 +102,7 @@ const TicketList = ({ tickets }) => {
             id="sortBy"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="text-sm border rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-sm border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#FBA415] focus:border-[#FBA415]"
           >
             <option value="date">Date</option>
             <option value="price">Price</option>
@@ -137,7 +137,7 @@ const TicketList = ({ tickets }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="text-center py-12 bg-gray-50 rounded-lg"
+            className="text-center py-12 bg-white rounded-lg shadow-sm"
           >
             <p className="text-gray-500 text-lg">
               {activeTab === "all"

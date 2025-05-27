@@ -1,20 +1,50 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { useState, useEffect } from "react";
+import { FiSearch, FiMenu, FiX, FiLogOut } from "react-icons/fi";
 
 const Header = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
+
+  // Initialize search from URL params when component mounts or location changes
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const searchQuery = searchParams.get('search');
+    if (searchQuery) {
+      setSearch(searchQuery);
+    }
+  }, [location.search]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (search.trim()) {
-      navigate(`/events?search=${encodeURIComponent(search)}`);
-      setSearch("");
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set('search', search.trim());
+      
+      if (!location.pathname.startsWith('/events')) {
+        navigate(`/events?${searchParams.toString()}`);
+      } else {
+        navigate(`${location.pathname}?${searchParams.toString()}`, { replace: true });
+      }
+      
+      if (!location.pathname.startsWith('/events')) {
+        setSearch("");
+      }
       setIsMenuOpen(false);
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearch("");
+    if (location.pathname.startsWith('/events')) {
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.delete('search');
+      navigate(`${location.pathname}?${searchParams.toString()}`, { replace: true });
     }
   };
 
@@ -22,6 +52,7 @@ const Header = () => {
     logout();
     navigate("/");
     setIsMenuOpen(false);
+    setIsAdminMenuOpen(false);
   };
 
   // Helper: is admin
@@ -46,11 +77,25 @@ const Header = () => {
                 <input
                   type="text"
                   placeholder="Search for an event..."
-                  className="w-full pl-4 pr-10 py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none text-gray-700 bg-white"
+                  className="w-full pl-4 pr-10 py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-[#FBA415] focus:border-[#FBA415] outline-none text-gray-700 bg-white"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                 />
-                <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-yellow-500 hover:text-yellow-600">
+                {search && (
+                  <button
+                    type="button"
+                    onClick={handleClearSearch}
+                    className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    aria-label="Clear search"
+                  >
+                    ×
+                  </button>
+                )}
+                <button 
+                  type="submit" 
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[#FBA415] hover:text-[#FBA415]/80"
+                  aria-label="Search"
+                >
                   <FiSearch size={20} />
                 </button>
               </div>
@@ -60,37 +105,90 @@ const Header = () => {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center space-x-6">
             {isAdmin ? (
-              <NavLink to="/admin" className={({ isActive }) => `hover:text-yellow-600 ${isActive ? "text-yellow-600 font-semibold" : "text-gray-700"}`}>Admin Panel</NavLink>
+              <>
+                <NavLink
+                  to="/admin"
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive
+                        ? "bg-[#FBA415]/10 text-[#FBA415]"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`
+                  }
+                >
+                  Dashboard
+                </NavLink>
+                <NavLink
+                  to="/admin/events"
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive
+                        ? "bg-[#FBA415]/10 text-[#FBA415]"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`
+                  }
+                >
+                  Manage Events
+                </NavLink>
+                <NavLink
+                  to="/admin/payments"
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive
+                        ? "bg-[#FBA415]/10 text-[#FBA415]"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`
+                  }
+                >
+                  Payments
+                </NavLink>
+                <NavLink
+                  to="/admin/scanner"
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive
+                        ? "bg-[#FBA415]/10 text-[#FBA415]"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`
+                  }
+                >
+                  Ticket Scanner
+                </NavLink>
+                <button
+                  onClick={handleLogout}
+                  className="ml-2 px-4 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium transition flex items-center space-x-2"
+                >
+                  <FiLogOut />
+                  <span>Logout</span>
+                </button>
+              </>
             ) : (
               <>
-                <NavLink to="/" className={({ isActive }) => `hover:text-yellow-600 ${isActive ? "text-yellow-600 font-semibold" : "text-gray-700"}`}>Home</NavLink>
-                <NavLink to="/events" className={({ isActive }) => `hover:text-yellow-600 ${isActive ? "text-yellow-600 font-semibold" : "text-gray-700"}`}>Find Events</NavLink>
-                <NavLink to="/contact" className={({ isActive }) => `hover:text-yellow-600 ${isActive ? "text-yellow-600 font-semibold" : "text-gray-700"}`}>Contact</NavLink>
+                <NavLink to="/" className={({ isActive }) => `hover:text-[#FBA415] ${isActive ? "text-[#FBA415] font-semibold" : "text-gray-700"}`}>Home</NavLink>
+                <NavLink to="/events" className={({ isActive }) => `hover:text-[#FBA415] ${isActive ? "text-[#FBA415] font-semibold" : "text-gray-700"}`}>Find Events</NavLink>
+                <NavLink to="/contact" className={({ isActive }) => `hover:text-[#FBA415] ${isActive ? "text-[#FBA415] font-semibold" : "text-gray-700"}`}>Contact</NavLink>
                 {isAuthenticated ? (
                   <>
-                    <NavLink to="/my-tickets" className={({ isActive }) => `hover:text-yellow-600 ${isActive ? "text-yellow-600 font-semibold" : "text-gray-700"}`}>My Tickets</NavLink>
-                    <button onClick={handleLogout} className="ml-2 px-4 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium transition">Logout</button>
+                    <NavLink to="/my-tickets" className={({ isActive }) => `hover:text-[#FBA415] ${isActive ? "text-[#FBA415] font-semibold" : "text-gray-700"}`}>My Tickets</NavLink>
+                    <button onClick={handleLogout} className="ml-2 px-4 py-2 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium transition flex items-center space-x-2">
+                      <FiLogOut />
+                      <span>Logout</span>
+                    </button>
                   </>
                 ) : (
-                  <Link to="/login" className="ml-4 px-4 py-2 rounded-full border border-yellow-500 text-yellow-600 hover:bg-yellow-50 font-medium transition">Login</Link>
+                  <Link to="/login" className="ml-4 px-4 py-2 rounded-full border border-[#FBA415] text-[#FBA415] hover:bg-[#FBA415]/10 font-medium transition">Login</Link>
                 )}
               </>
             )}
           </nav>
 
-          {/* Hamburger for mobile */}
+          {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            className="md:hidden p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#FBA415]"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
-            <svg className="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
+            {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
         </div>
       </div>
@@ -105,11 +203,25 @@ const Header = () => {
                 <input
                   type="text"
                   placeholder="Search for an event..."
-                  className="w-full pl-4 pr-10 py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none text-gray-700 bg-white"
+                  className="w-full pl-4 pr-10 py-2 rounded-full border border-gray-300 focus:ring-2 focus:ring-[#FBA415] focus:border-[#FBA415] outline-none text-gray-700 bg-white"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                 />
-                <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-yellow-500 hover:text-yellow-600">
+                {search && (
+                  <button
+                    type="button"
+                    onClick={handleClearSearch}
+                    className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    aria-label="Clear search"
+                  >
+                    ×
+                  </button>
+                )}
+                <button 
+                  type="submit" 
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[#FBA415] hover:text-[#FBA415]/80"
+                  aria-label="Search"
+                >
                   <FiSearch size={20} />
                 </button>
               </div>
@@ -117,19 +229,31 @@ const Header = () => {
           )}
           <nav className="flex flex-col space-y-2 px-4 pb-4">
             {isAdmin ? (
-              <NavLink to="/admin" className={({ isActive }) => `block py-2 ${isActive ? "text-yellow-600 font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>Admin Panel</NavLink>
+              <>
+                <NavLink to="/admin" className={({ isActive }) => `block py-2 ${isActive ? "text-[#FBA415] font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>Dashboard</NavLink>
+                <NavLink to="/admin/events" className={({ isActive }) => `block py-2 ${isActive ? "text-[#FBA415] font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>Manage Events</NavLink>
+                <NavLink to="/admin/payments" className={({ isActive }) => `block py-2 ${isActive ? "text-[#FBA415] font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>Payments</NavLink>
+                <NavLink to="/admin/scanner" className={({ isActive }) => `block py-2 ${isActive ? "text-[#FBA415] font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>Ticket Scanner</NavLink>
+                <button onClick={handleLogout} className="block w-full text-left py-2 text-gray-700 hover:bg-gray-100 font-medium flex items-center space-x-2">
+                  <FiLogOut />
+                  <span>Logout</span>
+                </button>
+              </>
             ) : (
               <>
-                <NavLink to="/" className={({ isActive }) => `block py-2 ${isActive ? "text-yellow-600 font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>Home</NavLink>
-                <NavLink to="/events" className={({ isActive }) => `block py-2 ${isActive ? "text-yellow-600 font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>Find Events</NavLink>
-                <NavLink to="/contact" className={({ isActive }) => `block py-2 ${isActive ? "text-yellow-600 font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>Contact</NavLink>
+                <NavLink to="/" className={({ isActive }) => `block py-2 ${isActive ? "text-[#FBA415] font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>Home</NavLink>
+                <NavLink to="/events" className={({ isActive }) => `block py-2 ${isActive ? "text-[#FBA415] font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>Find Events</NavLink>
+                <NavLink to="/contact" className={({ isActive }) => `block py-2 ${isActive ? "text-[#FBA415] font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>Contact</NavLink>
                 {isAuthenticated ? (
                   <>
-                    <NavLink to="/my-tickets" className={({ isActive }) => `block py-2 ${isActive ? "text-yellow-600 font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>My Tickets</NavLink>
-                    <button onClick={handleLogout} className="block w-full text-left py-2 text-gray-700 hover:bg-gray-100 font-medium" >Logout</button>
+                    <NavLink to="/my-tickets" className={({ isActive }) => `block py-2 ${isActive ? "text-[#FBA415] font-semibold" : "text-gray-700"}`} onClick={() => setIsMenuOpen(false)}>My Tickets</NavLink>
+                    <button onClick={handleLogout} className="block w-full text-left py-2 text-gray-700 hover:bg-gray-100 font-medium flex items-center space-x-2">
+                      <FiLogOut />
+                      <span>Logout</span>
+                    </button>
                   </>
                 ) : (
-                  <Link to="/login" className="block py-2 text-yellow-600 font-medium" onClick={() => setIsMenuOpen(false)}>Login</Link>
+                  <Link to="/login" className="block py-2 text-[#FBA415] font-medium" onClick={() => setIsMenuOpen(false)}>Login</Link>
                 )}
               </>
             )}

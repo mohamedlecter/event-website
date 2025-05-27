@@ -189,7 +189,7 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#FBA415] focus:border-[#FBA415] transition-colors duration-200"
               disabled={isProcessing}
             >
-              <option value="stripe">Stripe (Credit Card)</option>
+              <option value="stripe">Visa, MasterCard, Credit Card</option>
               <option value="wave">Wave Mobile Money</option>
             </select>
             {paymentGateway === "wave" && (
