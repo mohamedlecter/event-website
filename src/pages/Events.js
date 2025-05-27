@@ -18,9 +18,8 @@ const Events = () => {
 
   const [sortBy, setSortBy] = useState('date');
   const [viewMode, setViewMode] = useState('grid');
-  const [isFilterVisible, setIsFilterVisible] = useState(true);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -68,15 +67,22 @@ const Events = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-8 py-8">
+    <div className="min-h-screen" style={{ background: '#C6D6D8C2' }}>
+      <div className="container mx-auto px-8 md:px-12 lg:px-16 py-12">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="mb-12"
         >
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Discover Events</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <div className="flex-1">
+            <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4">Discover Events</h1>
+            <div className="flex items-center gap-4">
+              <div className="h-1 w-10 bg-yellow-400 rounded-full" />
+              <div className="h-1 w-8 bg-yellow-400 rounded-full" />
+              <div className="h-1 w-10 bg-yellow-400 rounded-full" />
+            </div>
+          </div>
+          <p className="text-lg text-gray-600 max-w-2xl mt-4">
             Find and book tickets for the best events in your area. From concerts to conferences,
             we've got you covered.
           </p>
@@ -86,7 +92,7 @@ const Events = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsFilterVisible(!isFilterVisible)}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg shadow-sm hover:bg-yellow-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 transition-colors duration-200"
               aria-expanded={isFilterVisible}
               aria-controls="filter-section"
             >
@@ -96,7 +102,7 @@ const Events = () => {
             <select
               value={sortBy}
               onChange={handleSort}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg shadow-sm border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg shadow-sm border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 transition-colors duration-200"
               aria-label="Sort events by"
             >
               <option value="date">Sort by Date</option>
@@ -109,10 +115,10 @@ const Events = () => {
           <div className="flex items-center gap-2" role="radiogroup" aria-label="View mode">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg ${
+              className={`p-2 rounded-lg transition-colors duration-200 ${
                 viewMode === 'grid'
-                  ? 'bg-blue-100 text-blue-600'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-yellow-100 text-yellow-600'
+                  : 'text-gray-600 hover:bg-yellow-50'
               }`}
               role="radio"
               aria-checked={viewMode === 'grid'}
@@ -122,10 +128,10 @@ const Events = () => {
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 rounded-lg ${
+              className={`p-2 rounded-lg transition-colors duration-200 ${
                 viewMode === 'list'
-                  ? 'bg-blue-100 text-blue-600'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-yellow-100 text-yellow-600'
+                  : 'text-gray-600 hover:bg-yellow-50'
               }`}
               role="radio"
               aria-checked={viewMode === 'list'}
@@ -187,7 +193,7 @@ const Events = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-center py-16"
+                className="text-center py-16 bg-white rounded-lg shadow-sm"
               >
                 <div className="max-w-md mx-auto">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">

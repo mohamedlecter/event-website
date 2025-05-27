@@ -46,7 +46,7 @@ const EventCard = ({ event, viewMode }) => {
       whileHover={{ y: -5 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 ${
+      className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 ${
         isList ? 'max-w-4xl mx-auto' : ''
       }`}
       role="article"
@@ -58,7 +58,7 @@ const EventCard = ({ event, viewMode }) => {
         aria-label={`View details for ${event.title}`}
       >
         <div className={`relative overflow-hidden group ${
-          isList ? 'w-48 flex-shrink-0' : 'h-48'
+          isList ? 'w-48 flex-shrink-0' : 'h-44'
         }`}>
           <motion.img
             src={
@@ -76,25 +76,25 @@ const EventCard = ({ event, viewMode }) => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: isHovered ? 1 : 0 }}
-            className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
+            className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"
           />
-          <div className="absolute top-3 left-3">
-            <span className="px-2 py-1 bg-black/50 text-white text-xs rounded-full backdrop-blur-sm">
+          <div className="absolute top-2 left-2">
+            <span className="px-2 py-0.5 bg-yellow-400 text-gray-900 text-xs font-medium rounded-full">
               {event.category}
             </span>
           </div>
-          <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-            <p className="text-sm font-medium">{event.description.substring(0, 100)}...</p>
+          <div className="absolute bottom-0 left-0 right-0 p-3 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+            <p className="text-sm font-medium">{event.description.substring(0, 80)}...</p>
           </div>
         </div>
 
         <div className={`p-4 ${isList ? 'flex-1 flex flex-col' : ''}`}>
           <div className="flex justify-between items-start mb-2">
-            <h3 className="font-bold text-lg truncate">{event.title}</h3>
+            <h3 className="font-bold text-base text-gray-900 hover:text-yellow-600 transition-colors duration-200">{event.title}</h3>
             <motion.span
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              className={`px-2 py-1 text-xs rounded-full ${
+              className={`px-2 py-0.5 text-xs rounded-full ${
                 isUpcoming
                   ? "bg-green-100 text-green-800"
                   : "bg-gray-100 text-gray-800"
@@ -106,12 +106,12 @@ const EventCard = ({ event, viewMode }) => {
 
           <div className={`space-y-2 ${isList ? 'flex-1' : ''}`}>
             <div className="flex items-center text-gray-600 text-sm">
-              <span className="mr-2 font-medium">Date:</span>
+              <span className="mr-2 font-medium text-gray-900">Date:</span>
               {formatDate(eventDate)} at {formatTime(eventDate)}
             </div>
             
             <div className="flex items-center text-gray-600 text-sm">
-              <span className="mr-2 font-medium">Location:</span>
+              <span className="mr-2 font-medium text-gray-900">Location:</span>
               {event.location.city}, {event.location.country}
             </div>
 
@@ -122,20 +122,20 @@ const EventCard = ({ event, viewMode }) => {
             )}
           </div>
 
-          <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="mt-3 pt-3 border-t border-gray-100">
             <div className="flex justify-between items-center">
               <div>
-                <span className="text-sm font-medium text-gray-900">
-                  From ${event.standardTicket.price}
+                <span className="text-base font-bold text-gray-900">
+                  ${event.standardTicket.price}
                 </span>
-                <span className="text-xs text-gray-500 ml-2">
+                <span className="text-xs text-gray-500 ml-1">
                   / Standard
                 </span>
               </div>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className={`flex items-center px-2 py-1 rounded-full text-xs ${
+                className={`flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                   ticketStatus.color === "red"
                     ? "bg-red-100 text-red-800"
                     : ticketStatus.color === "orange"
@@ -143,7 +143,7 @@ const EventCard = ({ event, viewMode }) => {
                     : "bg-green-100 text-green-800"
                 }`}
               >
-                <div className={`w-2 h-2 rounded-full mr-2 ${
+                <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
                   ticketStatus.color === "red"
                     ? "bg-red-500"
                     : ticketStatus.color === "orange"

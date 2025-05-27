@@ -17,6 +17,8 @@ import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import EventDetails from "./components/events/EventDetails";
+import Contact from "./pages/Contact";
+
 
 import {
   Elements,
@@ -39,6 +41,7 @@ function App() {
                 <main>
                   <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/contact" element = {<Contact />} />
                     <Route path="/events" element={<Events />} />
                     <Route path="/events/:id" element={<EventDetails />} />
                     <Route

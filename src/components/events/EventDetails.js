@@ -84,12 +84,12 @@ const EventDetails = () => {
   const vipStatus = getTicketStatus(event.vipTicket);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="min-h-screen" style={{ background: '#C6D6D8C2' }}>
+      <div className="container mx-auto px-4 md:px-8 lg:px-12 py-8">
+        <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="md:flex">
-            <div className="md:w-1/2 relative">
-              <div className="relative h-64 md:h-full">
+            <div className="md:w-2/5 relative">
+              <div className="relative h-48 md:h-full">
                 {isImageLoading && (
                   <div className="absolute inset-0 bg-gray-200 animate-pulse" />
                 )}
@@ -103,63 +103,63 @@ const EventDetails = () => {
                   className="w-full h-full object-cover"
                   onLoad={() => setIsImageLoading(false)}
                 />
-                <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1 bg-black/50 text-white text-sm rounded-full">
+                <div className="absolute top-3 left-3">
+                  <span className="px-2.5 py-0.5 bg-[#FBA415] text-gray-900 text-xs font-medium rounded-full">
                     {event.category}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 md:p-8 md:w-1/2">
-              <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
+            <div className="p-5 md:p-6 md:w-3/5">
+              <h1 className="text-xl md:text-2xl font-bold mb-3 text-gray-900">{event.title}</h1>
               
-              <div className="space-y-4 mb-6">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 text-gray-500">📅</div>
+              <div className="space-y-3 mb-5">
+                <div className="flex items-start gap-2.5">
+                  <div className="flex-shrink-0 w-5 h-5 text-[#FBA415]">📅</div>
                   <div>
-                    <p className="text-gray-900 font-medium">Date & Time</p>
-                    <p className="text-gray-600">{formatDate(event.date)}</p>
+                    <p className="text-sm text-gray-900 font-medium">Date & Time</p>
+                    <p className="text-sm text-gray-600">{formatDate(event.date)}</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 text-gray-500">📍</div>
+                <div className="flex items-start gap-2.5">
+                  <div className="flex-shrink-0 w-5 h-5 text-[#FBA415]">📍</div>
                   <div>
-                    <p className="text-gray-900 font-medium">Location</p>
-                    <p className="text-gray-600">
+                    <p className="text-sm text-gray-900 font-medium">Location</p>
+                    <p className="text-sm text-gray-600">
                       {event.location.city}, {event.location.country}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-3">About This Event</h2>
-                <p className="text-gray-700 leading-relaxed">{event.description}</p>
+              <div className="mb-5">
+                <h2 className="text-base font-semibold mb-2 text-gray-900">About This Event</h2>
+                <p className="text-sm text-gray-700 leading-relaxed">{event.description}</p>
               </div>
 
-              <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Ticket Options</h2>
+              <div className="mb-5">
+                <h2 className="text-base font-semibold mb-3 text-gray-900">Ticket Options</h2>
 
-                <div className="space-y-4">
-                  <div className="border rounded-lg p-4">
+                <div className="space-y-3">
+                  <div className="border rounded-lg p-3 hover:border-[#FBA415] transition-colors duration-200">
                     <div className="flex justify-between items-center mb-2">
                       <div>
-                        <h3 className="font-semibold text-lg">Standard Ticket</h3>
-                        <p className="text-sm text-gray-600">
+                        <h3 className="font-semibold text-base text-gray-900">Standard Ticket</h3>
+                        <p className="text-xs text-gray-600">
                           Regular admission to the event
                         </p>
                       </div>
-                      <span className="text-2xl font-bold text-gray-900">
-                        ${event.standardTicket.price}
+                      <span className="text-m font-bold text-gray-900">
+                        GMD {event.standardTicket.price}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between mb-4">
-                      <p className="text-sm text-gray-600">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs text-gray-600">
                         {event.standardTicket.quantity - event.standardTicket.sold} remaining
                       </p>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${
                         standardStatus.color === "red"
                           ? "bg-red-100 text-red-800"
                           : standardStatus.color === "orange"
@@ -172,10 +172,10 @@ const EventDetails = () => {
                     <button
                       onClick={() => handlePurchaseClick("standard")}
                       disabled={event.standardTicket.sold >= event.standardTicket.quantity}
-                      className={`w-full py-3 rounded-md font-medium ${
+                      className={`w-full py-2 rounded-md font-medium transition-colors duration-200 ${
                         event.standardTicket.sold >= event.standardTicket.quantity
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-blue-600 hover:bg-blue-700 text-white"
+                          : "bg-[#FBA415] hover:bg-[#FBA415]/90 text-gray-900"
                       }`}
                     >
                       {event.standardTicket.sold >= event.standardTicket.quantity
@@ -184,23 +184,23 @@ const EventDetails = () => {
                     </button>
                   </div>
 
-                  <div className="border rounded-lg p-4">
+                  <div className="border rounded-lg p-3 hover:border-[#FBA415] transition-colors duration-200">
                     <div className="flex justify-between items-center mb-2">
                       <div>
-                        <h3 className="font-semibold text-lg">VIP Ticket</h3>
-                        <p className="text-sm text-gray-600">
+                        <h3 className="font-semibold text-base text-gray-900">VIP Ticket</h3>
+                        <p className="text-xs text-gray-600">
                           Premium experience with exclusive benefits
                         </p>
                       </div>
-                      <span className="text-2xl font-bold text-gray-900">
-                        ${event.vipTicket.price}
+                      <span className="text-m font-bold text-gray-900">
+                        GMD {event.vipTicket.price}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between mb-4">
-                      <p className="text-sm text-gray-600">
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs text-gray-600">
                         {event.vipTicket.quantity - event.vipTicket.sold} remaining
                       </p>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${
                         vipStatus.color === "red"
                           ? "bg-red-100 text-red-800"
                           : vipStatus.color === "orange"
@@ -213,10 +213,10 @@ const EventDetails = () => {
                     <button
                       onClick={() => handlePurchaseClick("vip")}
                       disabled={event.vipTicket.sold >= event.vipTicket.quantity}
-                      className={`w-full py-3 rounded-md font-medium ${
+                      className={`w-full py-2 rounded-md font-medium transition-colors duration-200 ${
                         event.vipTicket.sold >= event.vipTicket.quantity
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : "bg-blue-600 hover:bg-blue-700 text-white"
+                          : "bg-[#FBA415] hover:bg-[#FBA415]/90 text-gray-900"
                       }`}
                     >
                       {event.vipTicket.sold >= event.vipTicket.quantity
