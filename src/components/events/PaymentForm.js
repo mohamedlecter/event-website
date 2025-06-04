@@ -159,7 +159,7 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
     }
   }; 
 
-  const currency = paymentGateway === "wave" ? "GMD  " : "USD";
+  const currency = paymentGateway === "wave" ? "GMD  " : "GMD";
   const ticketPrice = ticketType === "vip" ? event.vipTicket.price : event.standardTicket.price;
   const totalAmount = ticketPrice * quantity;
 
