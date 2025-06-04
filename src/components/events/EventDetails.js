@@ -152,7 +152,7 @@ const EventDetails = () => {
                         </p>
                       </div>
                       <span className="text-m font-bold text-gray-900">
-                        GMD {event.standardTicket.price}
+                        GMD  {event.standardTicket.price}
                       </span>
                     </div>
                     <div className="flex items-center justify-between mb-3">
@@ -193,7 +193,7 @@ const EventDetails = () => {
                         </p>
                       </div>
                       <span className="text-m font-bold text-gray-900">
-                        GMD {event.vipTicket.price}
+                        GMD  {event.vipTicket.price}
                       </span>
                     </div>
                     <div className="flex items-center justify-between mb-3">

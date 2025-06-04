@@ -26,9 +26,9 @@ const EventFilter = ({ onFilter }) => {
   const priceRanges = [
     { value: 'all', label: 'All Prices' },
     { value: 'free', label: 'Free' },
-    { value: 'under50', label: 'Under $50' },
-    { value: 'under100', label: 'Under $100' },
-    { value: 'over100', label: 'Over $100' }
+    { value: 'under50', label: 'Under GMD 50' },
+    { value: 'under100', label: 'Under GMD 100' },
+    { value: 'over100', label: 'Over GMD 100' }
   ];
 
   const dateRanges = [

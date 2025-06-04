@@ -363,7 +363,7 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
                   </label>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                      $
+                      GMD 
                     </span>
                     <input
                       type="number"
@@ -410,7 +410,7 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
                   </label>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                      $
+                      GMD 
                     </span>
                     <input
                       type="number"

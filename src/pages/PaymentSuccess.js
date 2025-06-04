@@ -108,7 +108,7 @@ const PaymentSuccess = () => {
             <strong>Event:</strong> {paymentDetails.event.title}
           </p>
           <p className="mb-1">
-            <strong>Amount:</strong> ${paymentDetails.amount.toFixed(2)}
+            <strong>Amount:</strong> GMD {paymentDetails.amount.toFixed(2)}
           </p>
           <p className="mb-1">
             <strong>Reference:</strong> {paymentDetails.reference}

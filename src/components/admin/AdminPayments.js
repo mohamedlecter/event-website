@@ -84,7 +84,7 @@ const AdminPayments = () => {
                       <div className="text-sm text-gray-500">{payment.userDetails?.email}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{payment.eventDetails?.title}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${payment.amount}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">GMD {payment.amount}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {payment.status === "success" ? (
                         <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Success</span>
@@ -130,7 +130,7 @@ const AdminPayments = () => {
                 {[
                   { label: "User", value: `${payment.userDetails?.name} - ${payment.userDetails?.email}` },
                   { label: "Event", value: payment.eventDetails?.title },
-                  { label: "Amount", value: `$${payment.amount}` },
+                  { label: "Amount", value: `GMD ${payment.amount}` },
                   { label: "Status", value: payment.status },
                   { label: "Date", value: new Date(payment.createdAt).toLocaleDateString() },
                   { label: "Reference", value: payment.reference },

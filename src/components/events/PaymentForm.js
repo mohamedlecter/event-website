@@ -159,7 +159,7 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
     }
   }; 
 
-  const currency = paymentGateway === "wave" ? "GMD " : "USD";
+  const currency = paymentGateway === "wave" ? "GMD  " : "USD";
   const ticketPrice = ticketType === "vip" ? event.vipTicket.price : event.standardTicket.price;
   const totalAmount = ticketPrice * quantity;
 
@@ -194,7 +194,7 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
             </select>
             {paymentGateway === "wave" && (
               <div className="text-sm text-gray-600 mt-2">
-                <p>• Payments processed in GMD </p>
+                <p>• Payments processed in GMD  </p>
                 <p>• Requires Wave mobile app</p>
               </div>
             )}

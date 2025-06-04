@@ -70,13 +70,10 @@ const Contact = () => {
           {/* Contact Info */}
           <div className="flex flex-col justify-center space-y-6 text-gray-700">
             <div>
-              <span className="font-semibold">Email:</span> support@gesco.com
+              <span className="font-semibold">Email:</span> contact@e-tickets.online
             </div>
             <div>
-              <span className="font-semibold">Phone:</span> +1 (555) 123-4567
-            </div>
-            <div>
-              <span className="font-semibold">Address:</span> 123 Event St, City, Country
+              <span className="font-semibold">Phone:</span> +220 736 0361
             </div>
             <div className="flex space-x-4 mt-2">
               <a href="#" className="text-gray-400 hover:text-yellow-500" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>

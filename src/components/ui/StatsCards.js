@@ -30,7 +30,7 @@ const StatsCards = ({ filteredPayments }) => {
     },
     {
       label: "Total Revenue",
-      value: `$${totalRevenue.toFixed(2)}`,
+      value: `GMD ${totalRevenue.toFixed(2)}`,
       icon: <FiDollarSign />,
       color: "text-yellow-600 bg-yellow-100",
     },

@@ -50,8 +50,11 @@ const HeroSection = () => {
         {/* Text Block and Categories */}
         <div className="w-full md:w-1/2 flex flex-col items-start md:items-start gap-6">
           <div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">One Platform. Every Ticket. Your Ticket to Everything – Anytime, Anywhere.</h1>
-            <p className="text-xl md:text-l text-gray-700 font-medium">Buy and manage tickets for events, travel, and entertainment with ease. 100% digital. No lines. No stress.Book, scan, and go in seconds.</p>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">One Platform. Every Ticket. Your Access to Everything — Anytime, Anywhere.</h1>
+            <p className="text-xl md:text-l text-gray-700 font-medium">Buy and manage tickets for events, travel, and entertainment with ease.</p>
+            <p className="text-xl md:text-l text-gray-700 font-medium">100% digital. No lines. No stress.</p>
+            <p className="text-xl md:text-l text-gray-700 font-medium">Book, scan, and go — all in seconds.</p>
+          
           </div>
           <div className="flex gap-4 mt-4 flex-wrap">
             {categories.length === 0 ? (
