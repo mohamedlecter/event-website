@@ -25,7 +25,6 @@ export const initiatePayment = async (eventId, paymentData) => {
     // Ensure eventId is a string
     const eventIdStr = eventId.toString();
     
-    // The payment data is already formatted correctly in the PaymentForm component
     const response = await apiClient.post(`/events/${eventIdStr}/pay`, paymentData);
     return response.data;
   } catch (error) {

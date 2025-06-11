@@ -145,7 +145,19 @@ export const EventProvider = ({ children }) => {
     setError(null);
     const token = localStorage.getItem("token");
     try {
-      const payment = await verifyPayment(sessionId, gateway, token);
+      // For Wave payments, use the stored reference
+      const reference = gateway === 'wave' ? localStorage.getItem('wavePaymentReference') : sessionId;
+      if (!reference) {
+        throw new Error("Payment reference not found");
+      }
+      
+      const payment = await verifyPayment(reference, gateway);
+      
+      // Clear the stored reference after successful verification
+      if (gateway === 'wave') {
+        localStorage.removeItem('wavePaymentReference');
+      }
+      
       return payment;
     } catch (err) {
       setError(err.message || "Failed to confirm payment. Please try again later.");

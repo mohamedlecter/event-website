@@ -123,12 +123,7 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
         recipientType,
         recipientInfo,
         paymentGateway,
-        metadata: {
-          eventId: eventIdStr,
-          eventTitle: event.title,
-          ticketType: ticketType,
-          quantity: quantity.toString()
-        }
+        currency: "GMD"
       };
 
       const response = await purchaseTickets(eventIdStr, paymentData);
@@ -147,10 +142,13 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
           throw error;
         }
       } else if (paymentGateway === "wave") {
-        if (!response.wave_launch_url) {
+        if (!response.paymentUrl) {
           throw new Error("Wave payment URL not received.");
         }
-        window.location.href = response.wave_launch_url;
+        // Store the reference in localStorage for verification
+        localStorage.setItem('wavePaymentReference', response.reference);
+        // Redirect to Wave payment URL
+        window.location.href = response.paymentUrl;
       }
     } catch (err) {
       console.error("Payment initiation failed:", err);
