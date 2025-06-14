@@ -18,9 +18,11 @@ export const searchTickets = async (reference) => {
   }
 };
 
-export const scanTicket = async (ticketId) => {
+export const scanTicket = async (ticketId, qrData) => {
   try {
-    const response = await apiClient.put(`/admin/tickets/${ticketId}/scan`);
+    const response = await apiClient.put(`/admin/tickets/${ticketId}/scan`, {
+      qrData
+    });
     return response.data;
   } catch (error) {
     console.error('Error scanning ticket:', error);

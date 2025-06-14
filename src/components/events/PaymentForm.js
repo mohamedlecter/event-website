@@ -142,13 +142,19 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
           throw error;
         }
       } else if (paymentGateway === "wave") {
-        if (!response.paymentUrl) {
-          throw new Error("Wave payment URL not received.");
+        console.log('Wave payment response:', response); // Debug log
+        
+        // Check for both possible response formats
+        const paymentUrl = response.paymentUrl || response.wave_launch_url;
+        if (!paymentUrl) {
+          console.error('Invalid Wave response:', response); // Debug log
+          throw new Error("Wave payment URL not received. Please try again.");
         }
+        
         // Store the reference in localStorage for verification
         localStorage.setItem('wavePaymentReference', response.reference);
         // Redirect to Wave payment URL
-        window.location.href = response.paymentUrl;
+        window.location.href = paymentUrl;
       }
     } catch (err) {
       console.error("Payment initiation failed:", err);

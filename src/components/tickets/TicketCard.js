@@ -211,12 +211,18 @@ const TicketCard = ({ ticket }) => {
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="p-4 bg-white rounded-lg shadow-sm border border-gray-100"
               >
-                <QRCodeSVG
-                  value={`${ticket.reference}-${ticket._id}`}
-                  size={128}
-                  level="H"
-                  includeMargin={true}
-                />
+                {ticket.qrCode ? (
+                  <img 
+                    src={ticket.qrCode.data} 
+                    alt="Ticket QR Code" 
+                    className="w-32 h-32"
+                  />
+                ) : (
+                  <div className="text-center text-gray-500">
+                    <p>QR Code not available</p>
+                    <p className="text-sm">Please refresh the page</p>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

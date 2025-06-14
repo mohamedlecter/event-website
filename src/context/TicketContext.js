@@ -5,42 +5,38 @@ const TicketContext = createContext();
 
 export const TicketProvider = ({ children }) => {
   const [ticket, setTicket] = useState(null);
-  const [isScanning, setIsScanning] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSearchTicket = async (reference) => {
-    if (!reference) {
-      setError("Please enter a ticket reference number.");
-      return;
-    }
-
     setIsSearching(true);
     setError(null);
     try {
-      const result = await searchTickets(reference);
-      setTicket(result);
+      const data = await searchTickets(reference);
+      setTicket(data);
     } catch (err) {
+      setError(err.message || "Failed to search ticket");
       setTicket(null);
-      setError(err.response?.data?.message || err.message || "Failed to search ticket. Please try again.");
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handleScanTicket = async (ticketId) => {
-    if (!ticketId) {
-      setError("Invalid ticket ID.");
-      return;
-    }
-
+  const handleScanTicket = async (ticketId, qrData) => {
     setIsScanning(true);
     setError(null);
     try {
-      const result = await scanTicket(ticketId);
-      setTicket(result);
+      const data = await scanTicket(ticketId, qrData);
+      if (ticket) {
+        setTicket(ticket.map(t => 
+          t._id === data.ticket.id ? { ...t, scanned: true, scannedAt: data.ticket.scannedAt } : t
+        ));
+      }
+      return data;
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Failed to scan ticket. Please try again.");
+      setError(err.message || "Failed to scan ticket");
+      throw err;
     } finally {
       setIsScanning(false);
     }
