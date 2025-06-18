@@ -1,24 +1,121 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTicket } from "../../context/TicketContext";
 import { useAdmin } from "../../context/AdminContext";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";
-import QrScanner from 'react-qr-scanner';
+import QrScanner from 'qr-scanner';
 
 const AdminTicketScanner = () => {
   const [reference, setReference] = useState("");
   const [adminError, setAdminError] = useState(null);
   const [scanSuccess, setScanSuccess] = useState(null);
-  const [showScanner, setShowScanner] = useState(false);
+  const [showScanner, setShowScanner] = useState(true);
+  const [isScanning, setIsScanning] = useState(false);
+  const [cameraPermission, setCameraPermission] = useState(null);
+  const [scanAttempts, setScanAttempts] = useState(0);
+  const videoRef = useRef(null);
+  const qrScannerRef = useRef(null);
 
   const {
     ticket,
     isSearching,
-    isScanning,
     error,
     handleSearchTicket,
     handleScanTicket,
   } = useTicket();
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (qrScannerRef.current) {
+        qrScannerRef.current.stop();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (showScanner && videoRef.current) {
+      startScanner();
+    } else if (!showScanner && qrScannerRef.current) {
+      stopScanner();
+    }
+  }, [showScanner]);
+
+  const checkCameraPermission = async () => {
+    try {
+      // Try the modern permissions API first
+      if (navigator.permissions && navigator.permissions.query) {
+        const permission = await navigator.permissions.query({ name: 'camera' });
+        setCameraPermission(permission.state);
+        
+        permission.onchange = () => {
+          setCameraPermission(permission.state);
+        };
+        
+        return permission.state === 'granted';
+      }
+    } catch (error) {
+      console.warn('Permission API not supported or failed:', error);
+    }
+    
+    // Fallback: try to access camera directly
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      stream.getTracks().forEach(track => track.stop()); // Stop the test stream
+      setCameraPermission('granted');
+      return true;
+    } catch (error) {
+      console.warn('Direct camera access failed:', error);
+      setCameraPermission('denied');
+      return false;
+    }
+  };
+
+  const startScanner = async () => {
+    try {
+      setIsScanning(true);
+      setAdminError(null);
+      
+      // Try to start scanner directly first
+      qrScannerRef.current = new QrScanner(
+        videoRef.current,
+        (result) => {
+          handleQRScan(result.data);
+        },
+        {
+          returnDetailedScanResult: true,
+          highlightScanRegion: true,
+          highlightCodeOutline: true,
+          maxScansPerSecond: 1, // Prevent multiple rapid scans
+        }
+      );
+      
+      await qrScannerRef.current.start();
+      setScanAttempts(0);
+      setCameraPermission('granted');
+    } catch (error) {
+      console.error('Failed to start scanner:', error);
+      if (error.name === 'NotAllowedError') {
+        setAdminError('Camera access denied. Please allow camera permissions in your browser settings and refresh the page.');
+      } else if (error.name === 'NotFoundError') {
+        setAdminError('No camera found. Please connect a camera and try again.');
+      } else if (error.name === 'NotSupportedError') {
+        setAdminError('Camera not supported in this browser. Please try a different browser.');
+      } else {
+        setAdminError('Failed to start camera. Please check camera permissions and try again.');
+      }
+      setCameraPermission('denied');
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const stopScanner = () => {
+    if (qrScannerRef.current) {
+      qrScannerRef.current.stop();
+      qrScannerRef.current = null;
+    }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -30,7 +127,7 @@ const AdminTicketScanner = () => {
 
   const handleScan = async (ticketId) => {
     try {
-      await handleScanTicket(ticketId);
+      await handleScanTicket(ticketId, null); // Pass null for qrData when manually scanning
       setAdminError(null);
       setScanSuccess("Ticket scanned successfully!");
     } catch (err) {
@@ -42,27 +139,30 @@ const AdminTicketScanner = () => {
   const handleQRScan = async (result) => {
     if (result) {
       try {
+        setScanAttempts(prev => prev + 1);
+        
         // Parse the QR code data
-        const qrData = JSON.parse(result.text);
+        const qrData = JSON.parse(result);
         if (!qrData.ticketId) {
           throw new Error("Invalid QR code format");
         }
         
-        await handleScanTicket(qrData.ticketId, result.text);
+        await handleScanTicket(qrData.ticketId, result);
         setAdminError(null);
         setScanSuccess("Ticket scanned successfully!");
         setShowScanner(false);
+        setScanAttempts(0);
       } catch (err) {
         console.error("QR Scan Error:", err);
-        setAdminError(err.message || "Failed to scan QR code. Please try again.");
+        if (scanAttempts >= 3) {
+          setAdminError("Multiple scan attempts failed. Please check the QR code or try manual entry.");
+          setShowScanner(false);
+        } else {
+          setAdminError(err.message || "Failed to scan QR code. Please try again.");
+        }
         setScanSuccess(null);
       }
     }
-  };
-
-  const handleQRScanError = (err) => {
-    console.error("QR Scan Error:", err);
-    setAdminError("Failed to scan QR code. Please try again.");
   };
 
   if(ticket){
@@ -76,20 +176,51 @@ const AdminTicketScanner = () => {
       <div className="flex gap-4 mb-6">
         <button
           onClick={() => setShowScanner(!showScanner)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+          disabled={isScanning}
         >
           {showScanner ? "Hide QR Scanner" : "Show QR Scanner"}
         </button>
+        
+        {cameraPermission === 'denied' && (
+          <span className="text-red-600 text-sm flex items-center">
+            ⚠️ Camera access denied
+          </span>
+        )}
       </div>
 
       {showScanner && (
         <div className="mb-6">
-          <QrScanner
-            delay={300}
-            onError={handleQRScanError}
-            onScan={handleQRScan}
-            style={{ width: '100%', maxWidth: '400px' }}
-          />
+          <div className="relative">
+            <video
+              ref={videoRef}
+              className="w-full max-w-md mx-auto border rounded-lg"
+            />
+            {isScanning && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
+                <div className="text-center">
+                  <LoadingSpinner />
+                  <p className="text-white mt-2">Starting camera...</p>
+                </div>
+              </div>
+            )}
+            
+            {/* Scan overlay */}
+            {!isScanning && showScanner && (
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-2 border-blue-500 rounded-lg">
+                  <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-blue-500"></div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-blue-500"></div>
+                  <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-blue-500"></div>
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-blue-500"></div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="text-center mt-2 text-sm text-gray-600">
+            Position the QR code within the frame
+          </div>
         </div>
       )}
 
@@ -119,7 +250,7 @@ const AdminTicketScanner = () => {
         </div>
       </form>
 
-      {(isSearching || isScanning) && <LoadingSpinner />}
+      {isSearching && <LoadingSpinner />}
       {error && <ErrorAlert message={error} />}
       {adminError && <ErrorAlert message={adminError} />}
       {scanSuccess && (
@@ -154,18 +285,38 @@ const AdminTicketScanner = () => {
                       <span className="font-medium">Type:</span>{" "}
                       <span className="capitalize">{t.ticketType}</span>
                     </p>
-                    <p>
-                      <span className="font-medium">Status:</span>{" "}
-                      <span
-                        className={
-                          t.status === "success"
-                            ? "text-green-500 font-medium"
-                            : "text-yellow-500 font-medium"
-                        }
-                      >
-                        {t.status}
-                      </span>
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-medium">Status:</span>{" "}
+                        <span
+                          className={
+                            t.status === "success"
+                              ? "text-green-500 font-medium"
+                              : "text-yellow-500 font-medium"
+                          }
+                        >
+                          {t.status}
+                        </span>
+                      </div>
+                      {t.status === "success" && !t.scanned && (
+                        <button
+                          onClick={() => handleScan(t._id)}
+                          disabled={isScanning}
+                          className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 disabled:opacity-50 text-sm flex items-center gap-1"
+                        >
+                          {isScanning ? (
+                            <>
+                              <LoadingSpinner size="sm" />
+                              Scanning...
+                            </>
+                          ) : (
+                            <>
+                              ✓ Scan Manually
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
                     {t.scanned && (
                       <p className="text-sm text-gray-500 mt-2">
                         <span className="font-medium">Scanned at:</span>{" "}
@@ -176,22 +327,6 @@ const AdminTicketScanner = () => {
                 </div>
 
                 <div className="flex-shrink-0">
-                  {t.status === "success" && !t.scanned && (
-                    <button
-                      onClick={() => handleScan(t._id)}
-                      disabled={isScanning}
-                      className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
-                    >
-                      {isScanning ? (
-                        <>
-                          <LoadingSpinner size="sm" />
-                          Scanning...
-                        </>
-                      ) : (
-                        "Scan Ticket"
-                      )}
-                    </button>
-                  )}
 
                   {t.scanned && (
                     <span className="inline-flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">

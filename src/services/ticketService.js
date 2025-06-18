@@ -20,9 +20,17 @@ export const searchTickets = async (reference) => {
 
 export const scanTicket = async (ticketId, qrData) => {
   try {
-    const response = await apiClient.put(`/admin/tickets/${ticketId}/scan`, {
-      qrData
-    });
+    const requestBody = {};
+    
+    if (qrData) {
+      requestBody.qrData = qrData;
+    } else if (ticketId) {
+      // For manual scanning, we still need to send the ticketId in the body
+      // since the backend expects either ticketId or qrData in the body
+      requestBody.ticketId = ticketId;
+    }
+    
+    const response = await apiClient.put(`/admin/tickets/${ticketId}/scan`, requestBody);
     return response.data;
   } catch (error) {
     console.error('Error scanning ticket:', error);

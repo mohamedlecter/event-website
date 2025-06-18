@@ -25,7 +25,7 @@ const AdminPayments = () => {
   const confirmScan = async () => {
     if (ticketIdToScan) {
       try {
-        await handleScanTicket(ticketIdToScan);
+        await handleScanTicket(ticketIdToScan, null);
         setScanSuccess("Ticket scanned successfully!");
       } catch (err) {
         console.error("Scan failed:", err);
