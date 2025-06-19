@@ -35,7 +35,7 @@ const TicketCard = ({ ticket }) => {
   };
 
   const validateTicketForTransfer = () => {
-    if (!ticket.isPaid) {
+    if (ticket.status !== 'success') {
       setTransferError('Only paid tickets can be transferred. Please complete the payment first.');
       return false;
     }
