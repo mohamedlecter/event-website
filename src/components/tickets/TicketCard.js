@@ -194,7 +194,7 @@ const TicketCard = ({ ticket }) => {
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-start gap-4">
           <button
             onClick={() => setShowQRCode(!showQRCode)}
             className="px-4 py-2 text-sm font-medium text-[#FBA415] hover:text-[#FBA415]/80 transition-colors"
@@ -215,7 +215,7 @@ const TicketCard = ({ ticket }) => {
                   <img 
                     src={ticket.qrCode.data} 
                     alt="Ticket QR Code" 
-                    className="w-56 h-56"
+                    className="w-80 h-80"
                   />
                 ) : (
                   <div className="text-center text-gray-500">
