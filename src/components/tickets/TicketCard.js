@@ -215,7 +215,7 @@ const TicketCard = ({ ticket }) => {
                   <img 
                     src={ticket.qrCode.data} 
                     alt="Ticket QR Code" 
-                    className="w-32 h-32"
+                    className="w-56 h-56"
                   />
                 ) : (
                   <div className="text-center text-gray-500">
