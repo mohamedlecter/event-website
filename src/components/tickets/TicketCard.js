@@ -63,11 +63,6 @@ const TicketCard = ({ ticket }) => {
       return;
     }
 
-    // Validate mobile number format
-    if (transferType === 'mobile' && !/^[0-9]{10}$/.test(recipientValue)) {
-      setTransferError('Please enter a valid 10-digit mobile number.');
-      return;
-    }
 
     // Validate email format
     if (transferType === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipientValue)) {
@@ -366,9 +361,6 @@ const TicketCard = ({ ticket }) => {
                   onChange={(e) => setRecipientValue(e.target.value)}
                   placeholder={`Enter recipient's ${transferType === 'mobile' ? 'mobile number' : 'email'}`}
                   className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#FBA415] focus:border-[#FBA415]"
-                  required
-                  pattern={transferType === 'mobile' ? '[0-9]{10}' : undefined}
-                  title={transferType === 'mobile' ? 'Please enter a valid 10-digit mobile number' : undefined}
                 />
               </div>
 

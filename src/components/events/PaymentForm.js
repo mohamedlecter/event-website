@@ -72,14 +72,8 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
     }
 
     if (recipientType === "mobile") {
-      // Validate mobile numbers
-      for (let i = 0; i < recipientMobileNumbers.length; i++) {
-        const number = recipientMobileNumbers[i];
-        if (!number || !/^[0-9]{7}$/.test(number)) {
-          setError(`Please enter a valid 7-digit mobile number for recipient ${i + 1}.`);
-          return false;
-        }
-      }
+      // Validate mobile numbers - accept international format with country code
+
     } else {
       // Validate emails
       for (let i = 0; i < recipientEmails.length; i++) {
@@ -264,11 +258,9 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
                       type="tel"
                       value={number}
                       onChange={(e) => handleNumberChange(index, e.target.value)}
-                      placeholder={`Recipient ${index + 1} mobile number`}
+                      placeholder={`Recipient ${index + 1} mobile number (e.g., +220 1234567)`}
                       className="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-[#FBA415] focus:border-[#FBA415] transition-colors duration-200"
                       required
-                      pattern="[0-9]{7}"
-                      title="Please enter a valid 7-digit mobile number"
                       disabled={isProcessing}
                     />
                   </div>
