@@ -29,15 +29,28 @@ const EventAnalytics = () => {
   const chartData = [
     {
       name: 'Standard',
-      sold: analytics.event.standardTicket.sold,
-      remaining: analytics.event.standardTicket.quantity - analytics.event.standardTicket.sold,
+      sold: analytics.eventInfo.standardTicketsSold,
+      remaining: analytics.standardTicketsRemaining,
     },
     {
       name: 'VIP',
-      sold: analytics.event.vipTicket.sold,
-      remaining: analytics.event.vipTicket.quantity - analytics.event.vipTicket.sold,
+      sold: analytics.eventInfo.vipTicketsSold,
+      remaining: analytics.vipTicketsRemaining
     }
   ];
+
+  // const chartData = [
+  //   {
+  //     name: 'Standard',
+  //     sold: analytics.event.standardTicket.sold,
+  //     remaining: analytics.event.standardTicket.quantity - analytics.event.standardTicket.sold,
+  //   },
+  //   {
+  //     name: 'VIP',
+  //     sold: analytics.event.vipTicket.sold,
+  //     remaining: analytics.event.vipTicket.quantity - analytics.event.vipTicket.sold,
+  //   }
+  // ];
 
   return (
     <div>
@@ -64,7 +77,7 @@ const EventAnalytics = () => {
             {analytics.standardTicketsRemaining + analytics.vipTicketsRemaining === 0 ? (
               <span className="text-red-600">Sold Out!</span>
             ) : (
-              analytics.event.standardTicket.sold + analytics.event.vipTicket.sold
+              analytics.eventInfo.vipTicketsSold + analytics.eventInfo.standardTicketsSold
             )}
           </p>
         </div>
@@ -72,7 +85,7 @@ const EventAnalytics = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="font-medium text-gray-500 mb-2">Standard Tickets</h3>
           <p className="text-3xl font-bold">
-            {analytics.event.standardTicket.sold} / {analytics.event.standardTicket.quantity}
+            {analytics.eventInfo.standardTicketsSold} / {analytics.event.standardTicket.quantity}
           </p>
           <p className="text-sm mt-1">
             {analytics.standardTicketsRemaining} remaining
@@ -82,7 +95,7 @@ const EventAnalytics = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="font-medium text-gray-500 mb-2">VIP Tickets</h3>
           <p className="text-3xl font-bold">
-            {analytics.event.vipTicket.sold} / {analytics.event.vipTicket.quantity}
+            {analytics.eventInfo.vipTicketsSold} / {analytics.event.vipTicket.quantity}
           </p>
           <p className="text-sm mt-1">
             {analytics.vipTicketsRemaining} remaining
