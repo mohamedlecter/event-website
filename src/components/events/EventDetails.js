@@ -75,6 +75,8 @@ const EventDetails = () => {
   };
 
   const getTicketStatus = (info, type) => {
+    if (!info) return { text: "Loading...", color: "gray" };
+
     const available = type === "vip"
         ? info.vipTicketsAvailable
         : info.standardTicketsAvailable;
