@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { useAuth } from "../../context/AuthContext";
-import { useEvents } from "../../context/EventContext";
-import { getServerUrl } from "../../config/env";
+import {useEffect, useState} from "react";
+import {useNavigate, useParams} from "react-router-dom";
+import {useAuth} from "../../context/AuthContext";
+import {useEvents} from "../../context/EventContext";
+import {getServerUrl} from "../../config/env";
 import PaymentForm from "./PaymentForm";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";
+
 
 const EventDetails = () => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [ticketType, setTicketType] = useState("standard");
   const [isImageLoading, setIsImageLoading] = useState(true);
   const { isAuthenticated } = useAuth();
-  const { selectedEvent, getEventDetails, isLoading, error } = useEvents();
+  const { selectedEvent, getEventDetails, selectedEventInfo, isLoading, error } = useEvents();
   const { id } = useParams();
   const navigate = useNavigate();
   const serverUrl = getServerUrl();
@@ -25,6 +25,7 @@ const EventDetails = () => {
   }, [id]);
 
   const event = selectedEvent;
+  const info = selectedEventInfo;
 
   if (isLoading) {
     return (
@@ -73,15 +74,25 @@ const EventDetails = () => {
     });
   };
 
-  const getTicketStatus = (ticket) => {
-    const remaining = ticket.quantity - ticket.sold;
-    if (remaining === 0) return { text: "Sold Out", color: "red" };
-    if (remaining < 5) return { text: "Almost Sold Out", color: "orange" };
+  const getTicketStatus = (info, type) => {
+    const available = type === "vip"
+        ? info.vipTicketsAvailable
+        : info.standardTicketsAvailable;
+
+    if (available === 0) {
+      return { text: "Sold Out", color: "red" };
+    }
+
+    if (available < 5) {
+      return { text: "Almost Sold Out", color: "orange" };
+    }
+
     return { text: "Available", color: "green" };
   };
 
-  const standardStatus = getTicketStatus(event.standardTicket);
-  const vipStatus = getTicketStatus(event.vipTicket);
+
+  const standardStatus = getTicketStatus(info, 'standard');
+  const vipStatus = getTicketStatus(info, 'vip');
 
   return (
     <div className="min-h-screen" style={{ background: '#C6D6D8C2' }}>
@@ -157,7 +168,7 @@ const EventDetails = () => {
                     </div>
                     <div className="flex items-center justify-between mb-3">
                       <p className="text-xs text-gray-600">
-                        {event.standardTicket.quantity - event.standardTicket.sold} remaining
+                        {info.standardTicketsAvailable} remaining
                       </p>
                       <span className={`px-2 py-0.5 text-xs rounded-full ${
                         standardStatus.color === "red"
@@ -171,14 +182,14 @@ const EventDetails = () => {
                     </div>
                     <button
                       onClick={() => handlePurchaseClick("standard")}
-                      disabled={event.standardTicket.sold >= event.standardTicket.quantity}
+                      disabled={info.standardTicketsAvailable === 0}
                       className={`w-full py-2 rounded-md font-medium transition-colors duration-200 ${
-                        event.standardTicket.sold >= event.standardTicket.quantity
+                        info.standardTicketsAvailable === 0
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                           : "bg-[#FBA415] hover:bg-[#FBA415]/90 text-gray-900"
                       }`}
                     >
-                      {event.standardTicket.sold >= event.standardTicket.quantity
+                      { info.standardTicketsAvailable === 0
                         ? "Sold Out"
                         : "Purchase Standard Ticket"}
                     </button>
@@ -198,7 +209,7 @@ const EventDetails = () => {
                     </div>
                     <div className="flex items-center justify-between mb-3">
                       <p className="text-xs text-gray-600">
-                        {event.vipTicket.quantity - event.vipTicket.sold} remaining
+                        {info.vipTicketsAvailable} remaining
                       </p>
                       <span className={`px-2 py-0.5 text-xs rounded-full ${
                         vipStatus.color === "red"
@@ -212,14 +223,14 @@ const EventDetails = () => {
                     </div>
                     <button
                       onClick={() => handlePurchaseClick("vip")}
-                      disabled={event.vipTicket.sold >= event.vipTicket.quantity}
+                      disabled={info.vipTicketsAvailable === 0}
                       className={`w-full py-2 rounded-md font-medium transition-colors duration-200 ${
-                        event.vipTicket.sold >= event.vipTicket.quantity
+                        info.vipTicketsAvailable === 0
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                           : "bg-[#FBA415] hover:bg-[#FBA415]/90 text-gray-900"
                       }`}
                     >
-                      {event.vipTicket.sold >= event.vipTicket.quantity
+                      {info.vipTicketsAvailable === 0
                         ? "Sold Out"
                         : "Purchase VIP Ticket"}
                     </button>
@@ -234,6 +245,7 @@ const EventDetails = () => {
       {showPaymentForm && (
         <PaymentForm
           event={event}
+          info={info}
           ticketType={ticketType}
           onClose={() => setShowPaymentForm(false)}
         />

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {useState} from "react";
+import {AnimatePresence, motion} from "framer-motion";
 import TicketCard from "./TicketCard";
 
 const TicketList = ({ tickets }) => {

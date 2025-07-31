@@ -1,4 +1,5 @@
 import apiClient from './apiClient';
+
 export const getDashboardStats = async () => {
   try {
     const response = await apiClient.get('/admin/dashboard');

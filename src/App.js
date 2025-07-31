@@ -1,8 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import { EventProvider } from "./context/EventContext";
-import { AdminProvider } from "./context/AdminContext";
-import { TicketProvider } from "./context/TicketContext";
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import {AuthProvider} from "./context/AuthContext";
+import {EventProvider} from "./context/EventContext";
+import {AdminProvider} from "./context/AdminContext";
+import {TicketProvider} from "./context/TicketContext";
 
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
@@ -20,10 +20,8 @@ import EventDetails from "./components/events/EventDetails";
 import Contact from "./pages/Contact";
 
 
-import {
-  Elements,
-} from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
+import {Elements,} from '@stripe/react-stripe-js';
+import {loadStripe} from '@stripe/stripe-js';
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 

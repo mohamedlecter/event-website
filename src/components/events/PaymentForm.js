@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { useEvents } from "../../context/EventContext";
+import {useState} from "react";
+import {useEvents} from "../../context/EventContext";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";
-import { loadStripe } from "@stripe/stripe-js";
+import {loadStripe} from "@stripe/stripe-js";
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 
-const PaymentForm = ({ event, ticketType, onClose }) => {
+const PaymentForm = ({ event, info, ticketType, onClose }) => {
   const [quantity, setQuantity] = useState(1);
   const [recipientMobileNumbers, setRecipientMobileNumbers] = useState([""]);
   const [recipientEmails, setRecipientEmails] = useState([""]);
@@ -16,10 +16,12 @@ const PaymentForm = ({ event, ticketType, onClose }) => {
   const [error, setError] = useState(null);
   const { purchaseTickets, isLoading } = useEvents();
 
+  console.log('tickets on payment form: ', info);
+
   const maxTickets = Math.min(
     ticketType === "vip" 
-      ? event.vipTicket.quantity - event.vipTicket.sold
-      : event.standardTicket.quantity - event.standardTicket.sold,
+      ? info.vipTicketsAvailable
+      : info.standardTicketsAvailable,
     100 // Set a reasonable maximum limit
   );
 

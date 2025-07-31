@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { FiMusic, FiSmile, FiBookOpen, FiStar, FiBriefcase, FiCpu, FiAperture } from "react-icons/fi";
+import React, {useEffect, useState} from "react";
+import {FiAperture, FiMusic, FiStar} from "react-icons/fi";
 import apiClient from '../../services/apiClient';
 
 const categoryIconMap = {

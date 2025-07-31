@@ -1,11 +1,11 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {createContext, useContext, useState} from "react";
 import {
-  fetchEvents,
   fetchEventDetails,
-  initiatePayment,
-  verifyPayment,
+  fetchEvents,
   fetchUserTickets,
+  initiatePayment,
   transferTicket,
+  verifyPayment,
 } from "../services/eventService";
 
 const EventContext = createContext();
@@ -14,6 +14,7 @@ export const EventProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEventInfo, setSelectedEventInfo] = useState(null);
   const [tickets, setTickets] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -23,8 +24,8 @@ export const EventProvider = ({ children }) => {
     setError(null);
     try {
       const data = await fetchEvents(filters);
-      setEvents(data);
       setFilteredEvents(data);
+      setEvents(data);
       return data;
     } catch (err) {
       setError(err.message || "Failed to fetch events. Please try again later.");
@@ -39,7 +40,9 @@ export const EventProvider = ({ children }) => {
     setError(null);
     try {
       const data = await fetchEventDetails(id);
-      setSelectedEvent(data);
+      setSelectedEvent(data.event);
+      setSelectedEventInfo(data.info)
+      console.log(data.info);
       return data;
     } catch (err) {
       setError(err.message || "Failed to fetch event details. Please try again later.");
@@ -48,6 +51,7 @@ export const EventProvider = ({ children }) => {
       setIsLoading(false);
     }
   };
+
 
   const filterEvents = (filters) => {
     let results = [...events];
@@ -143,7 +147,6 @@ export const EventProvider = ({ children }) => {
   const confirmPayment = async (sessionId, gateway) => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
     try {
       // For Wave payments, use the stored reference
       const reference = gateway === 'wave' ? localStorage.getItem('wavePaymentReference') : sessionId;
@@ -207,6 +210,7 @@ export const EventProvider = ({ children }) => {
         events,
         filteredEvents,
         selectedEvent,
+        selectedEventInfo,
         tickets,
         isLoading,
         error,

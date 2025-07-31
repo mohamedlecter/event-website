@@ -1,7 +1,7 @@
-import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import { useState, useEffect } from "react";
-import { FiSearch, FiMenu, FiX, FiLogOut } from "react-icons/fi";
+import {Link, NavLink, useLocation, useNavigate} from "react-router-dom";
+import {useAuth} from "../../context/AuthContext";
+import {useEffect, useState} from "react";
+import {FiLogOut, FiMenu, FiSearch, FiX} from "react-icons/fi";
 
 const Header = () => {
   const { user, isAuthenticated, logout } = useAuth();

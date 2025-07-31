@@ -1,5 +1,5 @@
 import React from "react";
-import { FiCreditCard, FiCheck, FiSend, FiDollarSign } from "react-icons/fi";
+import {FiCheck, FiCreditCard, FiDollarSign, FiSend} from "react-icons/fi";
 
 const StatsCards = ({ filteredPayments }) => {
   // Calculate total revenue safely

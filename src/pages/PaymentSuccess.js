@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useEvents } from "../context/EventContext";
-import { useAuth } from "../context/AuthContext";
+import {useEffect, useState} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
+import {useEvents} from "../context/EventContext";
+import {useAuth} from "../context/AuthContext";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 const PaymentSuccess = () => {
@@ -11,7 +11,7 @@ const PaymentSuccess = () => {
   const [error, setError] = useState(null);
   const [isVerifying, setIsVerifying] = useState(true);
   const { confirmPayment, isLoading } = useEvents();
-  const { isAuthenticated, checkAuth } = useAuth();
+  const {checkAuth } = useAuth();
 
   useEffect(() => {
     const verify = async () => {
@@ -31,7 +31,6 @@ const PaymentSuccess = () => {
         const searchParams = new URLSearchParams(location.search);
         const sessionId = searchParams.get("session_id");
         const reference = searchParams.get("reference");
-        const gateway = searchParams.get("gateway");
 
         if (!sessionId && !reference) {
           throw new Error("No payment reference found");
@@ -48,6 +47,7 @@ const PaymentSuccess = () => {
               sessionId ? "stripe" : "wave"
             );
             setPaymentDetails(response.payment);
+
             break;
           } catch (err) {
             retryCount++;

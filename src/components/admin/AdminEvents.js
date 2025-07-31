@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useAdmin } from "../../context/AdminContext";
-import { getServerUrl } from "../../config/env";
+import {useEffect} from "react";
+import {Link} from "react-router-dom";
+import {useAdmin} from "../../context/AdminContext";
+import {getServerUrl} from "../../config/env";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";
 

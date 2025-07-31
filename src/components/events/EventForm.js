@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 import * as Yup from 'yup';
 
 const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
