@@ -1,11 +1,7 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import {
-  loginUser,
-  registerUser,
-  getCurrentUser,
-} from "../services/authService";
-import { jwtDecode } from "jwt-decode";
+import {createContext, useCallback, useContext, useEffect, useState} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
+import {getCurrentUser, loginUser, registerUser,} from "../services/authService";
+import {jwtDecode} from "jwt-decode";
 
 const AuthContext = createContext();
 

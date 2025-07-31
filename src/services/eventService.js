@@ -20,6 +20,7 @@ export const fetchEventDetails = async (id) => {
   }
 };
 
+
 export const initiatePayment = async (eventId, paymentData) => {
   try {
     // Ensure eventId is a string

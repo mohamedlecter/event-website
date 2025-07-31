@@ -1,5 +1,5 @@
-import { createContext, useContext, useState } from "react";
-import { searchTickets, scanTicket } from "../services/ticketService";
+import {createContext, useContext, useState} from "react";
+import {scanTicket, searchTickets} from "../services/ticketService";
 
 const TicketContext = createContext();
 

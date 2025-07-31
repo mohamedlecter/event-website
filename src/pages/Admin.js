@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import {Navigate, Route, Routes} from "react-router-dom";
 import AdminDashboard from "../components/admin/AdminDashboard";
 import AdminEvents from "../components/admin/AdminEvents";
 import AdminPayments from "../components/admin/AdminPayments";

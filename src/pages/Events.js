@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEvents } from '../context/EventContext';
+import {useEffect, useState} from 'react';
+import {AnimatePresence, motion} from 'framer-motion';
+import {useEvents} from '../context/EventContext';
 import EventCard from '../components/events/EventCard';
 import EventFilter from '../components/events/EventFilter';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorAlert from '../components/ui/ErrorAlert';
-import { getApiUrl } from '../config/env';
 
 const Events = () => {
   const { 

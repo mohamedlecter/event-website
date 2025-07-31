@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useAdmin } from "../../context/AdminContext";
-import { useTicket } from "../../context/TicketContext";
+import {useEffect, useState} from "react";
+import {useAdmin} from "../../context/AdminContext";
+import {useTicket} from "../../context/TicketContext";
 import ErrorAlert from "../ui/ErrorAlert";
 
 const AdminPayments = () => {

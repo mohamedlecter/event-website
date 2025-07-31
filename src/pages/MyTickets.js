@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { useEvents } from "../context/EventContext";
+import {useEffect, useState} from "react";
+import {motion} from "framer-motion";
+import {useEvents} from "../context/EventContext";
 import TicketList from "../components/tickets/TicketList";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import ErrorAlert from "../components/ui/ErrorAlert";

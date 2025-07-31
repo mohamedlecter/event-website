@@ -1,7 +1,7 @@
 import React from "react";
 import Slider from "react-slick";
 import EventCard from "./EventCard";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import {FiChevronLeft, FiChevronRight} from "react-icons/fi";
 
 const Arrow = ({ className, style, onClick, icon }) => (
   <button

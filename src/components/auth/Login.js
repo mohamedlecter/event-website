@@ -1,10 +1,9 @@
-import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import {useState} from "react";
+import {Link, useLocation, useNavigate} from "react-router-dom";
+import {useAuth} from "../../context/AuthContext";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";
-import { Link } from "react-router-dom";
-import { FiMail, FiLock, FiUser } from "react-icons/fi";
+import {FiLock, FiMail, FiUser} from "react-icons/fi";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({

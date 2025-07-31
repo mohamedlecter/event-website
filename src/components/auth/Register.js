@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import {useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
+import {useAuth} from "../../context/AuthContext";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";
-import { FiUser, FiMail, FiLock, FiPhone, FiUserPlus } from "react-icons/fi";
+import {FiLock, FiMail, FiPhone, FiUser, FiUserPlus} from "react-icons/fi";
 
 const Register = () => {
   const [userData, setUserData] = useState({

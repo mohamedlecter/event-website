@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEvents } from '../../context/EventContext';
+import {useEffect, useState} from 'react';
+import {AnimatePresence, motion} from 'framer-motion';
+import {useEvents} from '../../context/EventContext';
 import LoadingSpinner from '../ui/LoadingSpinner';
-import { QRCodeSVG } from 'qrcode.react';
-import { getTransferHistory, cancelTransfer } from '../../services/eventService';
+import {cancelTransfer, getTransferHistory} from '../../services/eventService';
 import ErrorAlert from '../ui/ErrorAlert';
 
 const TicketCard = ({ ticket }) => {

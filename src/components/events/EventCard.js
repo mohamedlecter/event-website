@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { getServerUrl } from "../../config/env";
+import {useState} from "react";
+import {Link} from "react-router-dom";
+import {motion} from "framer-motion";
+import {getServerUrl} from "../../config/env";
 
 const EventCard = ({ event, viewMode }) => {
   const [isHovered, setIsHovered] = useState(false);

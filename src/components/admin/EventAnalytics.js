@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { useAdmin } from '../../context/AdminContext';
+import {useEffect} from 'react';
+import {useParams} from 'react-router-dom';
+import {useAdmin} from '../../context/AdminContext';
 import LoadingSpinner from '../ui/LoadingSpinner';
 import ErrorAlert from '../ui/ErrorAlert';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 
 const EventAnalytics = () => {
   const { eventId } = useParams();

@@ -1,6 +1,5 @@
-import { useEffect } from 'react';
-import { useEvents } from '../context/EventContext';
-import EventCard from '../components/events/EventCard';
+import {useEffect} from 'react';
+import {useEvents} from '../context/EventContext';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ErrorAlert from '../components/ui/ErrorAlert';
 import HeroSection from '../components/layout/HeroSection';

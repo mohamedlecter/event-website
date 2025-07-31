@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { createEvent } from "../../services/eventService";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
+import {createEvent} from "../../services/eventService";
 import EventForm from "../../components/events/EventForm";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";

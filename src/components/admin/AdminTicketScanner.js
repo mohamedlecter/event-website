@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { useTicket } from "../../context/TicketContext";
-import { useAdmin } from "../../context/AdminContext";
+import {useEffect, useRef, useState} from "react";
+import {useTicket} from "../../context/TicketContext";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";
 import QrScanner from 'qr-scanner';

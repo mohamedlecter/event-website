@@ -1,10 +1,10 @@
-import { createContext, useContext, useState } from "react";
+import {createContext, useContext, useState} from "react";
 import {
-  getDashboardStats,
-  getAdminEvents,
-  fetchAllPayments,
-  getEventAnalytics,
-  deleteEvent,
+    deleteEvent,
+    fetchAllPayments,
+    getAdminEvents,
+    getDashboardStats,
+    getEventAnalytics,
 } from "../services/adminService";
 
 const AdminContext = createContext();

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getApiUrl } from '../config/env';
+import {getApiUrl} from '../config/env';
 
 
 // Create axios instance with default config

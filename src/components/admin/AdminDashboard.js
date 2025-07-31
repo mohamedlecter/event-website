@@ -1,7 +1,5 @@
-import { useEffect } from "react";
-import { useAdmin } from "../../context/AdminContext";
-import LoadingSpinner from "../ui/LoadingSpinner";
-import ErrorAlert from "../ui/ErrorAlert";
+import {useEffect} from "react";
+import {useAdmin} from "../../context/AdminContext";
 
 const AdminDashboard = () => {
   const { stats, isLoadingStats, error, fetchDashboardStats } = useAdmin();
