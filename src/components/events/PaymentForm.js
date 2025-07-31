@@ -2,16 +2,16 @@ import {useState} from "react";
 import {useEvents} from "../../context/EventContext";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import ErrorAlert from "../ui/ErrorAlert";
-import {loadStripe} from "@stripe/stripe-js";
+// import {loadStripe} from "@stripe/stripe-js";
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
+// const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 
 const PaymentForm = ({ event, info, ticketType, onClose }) => {
   const [quantity, setQuantity] = useState(1);
   const [recipientMobileNumbers, setRecipientMobileNumbers] = useState([""]);
   const [recipientEmails, setRecipientEmails] = useState([""]);
   const [recipientType, setRecipientType] = useState("mobile");
-  const [paymentGateway, setPaymentGateway] = useState("stripe");
+  const [paymentGateway, setPaymentGateway] = useState("wave");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
   const { purchaseTickets, isLoading } = useEvents();
@@ -124,20 +124,21 @@ const PaymentForm = ({ event, info, ticketType, onClose }) => {
 
       const response = await purchaseTickets(eventIdStr, paymentData);
 
-      if (paymentGateway === "stripe") {
-        const stripe = await stripePromise;
-        if (!stripe) {
-          throw new Error("Stripe failed to load. Please try again.");
-        }
+      // if (paymentGateway === "stripe") {
+      //   const stripe = await stripePromise;
+      //   if (!stripe) {
+      //     throw new Error("Stripe failed to load. Please try again.");
+      //   }
 
-        const { error } = await stripe.redirectToCheckout({
-          sessionId: response.id,
-        });
+      //   const { error } = await stripe.redirectToCheckout({
+      //     sessionId: response.id,
+      //   });
         
-        if (error) {
-          throw error;
-        }
-      } else if (paymentGateway === "wave") {
+      //   if (error) {
+      //     throw error;
+      //   }
+      // } else
+      if (paymentGateway === "wave") {
         console.log('Wave payment response:', response); // Debug log
         
         // Check for both possible response formats
@@ -189,7 +190,7 @@ const PaymentForm = ({ event, info, ticketType, onClose }) => {
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#FBA415] focus:border-[#FBA415] transition-colors duration-200"
               disabled={isProcessing}
             >
-              <option value="stripe">Visa, MasterCard, Credit Card</option>
+              {/* <option value="stripe">Visa, MasterCard, Credit Card</option> */}
               <option value="wave">Wave Mobile Money</option>
             </select>
             {paymentGateway === "wave" && (
