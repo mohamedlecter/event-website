@@ -46,12 +46,14 @@ const PaymentForm = ({ event, info, ticketType, onClose }) => {
           .sort((a, b) => a.name.localeCompare(b.name));
         setCountries(valid);
 
-        // Optionally set defaults for new recipients
-        setRecipientCountryCodes((old) =>
-          Array(quantity)
-            .fill(valid.length ? valid[0].code : "+1")
-            .map((code, i) => old[i] || code)
+        // Set Gambia as default if present, else first country
+        const gambia = valid.find(
+          (c) => c.name === "Gambia" && c.code === "+220"
         );
+        const defaultCode = gambia ? gambia.code : valid[0]?.code || "+1";
+
+        // Set ALL initial recipient country codes to Gambia (or default)
+        setRecipientCountryCodes(Array(quantity).fill(defaultCode));
       } catch (err) {
         console.error("Failed to fetch country codes", err);
       }
@@ -73,6 +75,10 @@ const PaymentForm = ({ event, info, ticketType, onClose }) => {
     const validQuantity = Math.min(Math.max(1, newQuantity), maxTickets);
     setQuantity(validQuantity);
 
+    // Find Gambia code
+    const gambia = countries.find(c => c.name === "Gambia" && c.code === "+220");
+    const defaultCode = gambia ? gambia.code : (countries[0]?.code || "+1");
+
     // Adjust recipient arrays
     const newMobileNumbers = [...recipientMobileNumbers];
     const newCountryCodes = [...recipientCountryCodes];
@@ -80,7 +86,7 @@ const PaymentForm = ({ event, info, ticketType, onClose }) => {
 
     while (newMobileNumbers.length < validQuantity) {
       newMobileNumbers.push("");
-      newCountryCodes.push(countries.length ? countries[0].code : "+1");
+      newCountryCodes.push(defaultCode); // Always use Gambia as default
       newEmails.push("");
     }
     setRecipientMobileNumbers(newMobileNumbers.slice(0, validQuantity));
@@ -295,18 +301,15 @@ const PaymentForm = ({ event, info, ticketType, onClose }) => {
                   <div key={index} className="flex items-center space-x-2">
                     <span className="text-gray-500 w-7">{index + 1}.</span>
                     <select
-                      value={recipientCountryCodes[index] || (countries.length ? countries[0].code : "+1")}
+                      value={recipientCountryCodes[index]}
                       onChange={(e) => handleCountryCodeChange(index, e.target.value)}
                       className="rounded-l-lg px-2 py-2 border border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#FBA415] focus:border-[#FBA415] sm:text-sm"
                       style={{ minWidth: 90 }}
                       required
                       disabled={isProcessing || !countries.length}
                     >
-                      {countries.map((country) => (
-                        <option
-                          key={`${country.code}-${country.name}`} // <-- Make key unique
-                          value={country.code}
-                        >
+                      {countries.map((country, idx) => (
+                        <option key={`${country.code}-${country.name}-${idx}`} value={country.code}>
                           {country.name} ({country.code})
                         </option>
                       ))}

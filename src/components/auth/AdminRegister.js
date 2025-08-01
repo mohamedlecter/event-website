@@ -47,8 +47,11 @@ const Register = () => {
           .sort((a, b) => a.name.localeCompare(b.name));
         setCountries(valid);
 
-        // Optionally set default to first country
-        if (valid.length > 0) setSelectedCountryCode(valid[0].code);
+        // Set Gambia as default if present, else first country
+        const gambia = valid.find(
+          (c) => c.name === "Gambia" && c.code === "+220"
+        );
+        setSelectedCountryCode(gambia ? gambia.code : valid[0]?.code || "+1");
       } catch (err) {
         console.error("Failed to fetch country codes", err);
       }
@@ -129,7 +132,10 @@ const Register = () => {
                 required
               >
                 {countries.map((country) => (
-                  <option key={`${country.code}-${country.name}`} value={country.code}>
+                  <option
+                    key={`${country.code}-${country.name}`}
+                    value={country.code}
+                  >
                     {country.name} ({country.code})
                   </option>
                 ))}
