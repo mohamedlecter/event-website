@@ -10,6 +10,8 @@ const AdminPayments = () => {
   const [showModal, setShowModal] = useState(false);
   const [ticketIdToScan, setTicketIdToScan] = useState(null);
   const [scanSuccess, setScanSuccess] = useState(null);
+  const [filterEvent, setFilterEvent] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
 
   useEffect(() => {
     if (!payments.length) {
@@ -40,6 +42,17 @@ const AdminPayments = () => {
     setShowModal(false);
   };
 
+  // Get unique event titles for dropdown
+  const eventOptions = [...new Set(payments.map(p => p.eventDetails?.title).filter(Boolean))];
+  const statusOptions = ["success", "pending", "failed"];
+
+  // Filter payments
+  const filteredPayments = payments.filter(payment => {
+    const eventMatch = filterEvent ? payment.eventDetails?.title === filterEvent : true;
+    const statusMatch = filterStatus ? payment.status === filterStatus : true;
+    return eventMatch && statusMatch;
+  });
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-6">
@@ -58,18 +71,47 @@ const AdminPayments = () => {
         </div>
       )}
 
-      {!error && payments.length === 0 && (
+      <div className="flex flex-wrap gap-4 mb-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Event</label>
+          <select
+            value={filterEvent}
+            onChange={e => setFilterEvent(e.target.value)}
+            className="border rounded px-3 py-2"
+          >
+            <option value="">All Events</option>
+            {eventOptions.map(event => (
+              <option key={event} value={event}>{event}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <select
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value)}
+            className="border rounded px-3 py-2"
+          >
+            <option value="">All Statuses</option>
+            {statusOptions.map(status => (
+              <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {!error && filteredPayments.length === 0 && (
         <div className="text-center py-4 text-gray-500">No payments found.</div>
       )}
 
-      {!error && payments.length > 0 && (
+      {!error && filteredPayments.length > 0 && (
         <>
           {/* Desktop Table */}
           <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  {["User", "Event", "Amount", "Status", "Date", "Reference", "Scanned", "Action"].map((header) => (
+                  {["User", "Mobile Number","Event", ,"Amount", "Status", "Date", "Reference", "Scanned", "Action"].map((header) => (
                     <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {header}
                     </th>
@@ -77,11 +119,14 @@ const AdminPayments = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {payments.map((payment) => (
+                {filteredPayments.map((payment) => (
                   <tr key={payment._id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{payment.userDetails?.name}</div>
                       <div className="text-sm text-gray-500">{payment.userDetails?.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {payment.userDetails?.mobileNumber || ''}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{payment.eventDetails?.title}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">GMD {payment.amount}</td>
@@ -125,10 +170,11 @@ const AdminPayments = () => {
 
           {/* Mobile Cards */}
           <div className="md:hidden space-y-4">
-            {payments.map((payment) => (
+            {filteredPayments.map((payment) => (
               <div key={payment._id} className="bg-white rounded-lg shadow p-4 space-y-2">
                 {[
                   { label: "User", value: `${payment.userDetails?.name} - ${payment.userDetails?.email}` },
+                  {label: "Phone Number", value: payment.userDetails?.mobileNumber || ''},
                   { label: "Event", value: payment.eventDetails?.title },
                   { label: "Amount", value: `GMD ${payment.amount}` },
                   { label: "Status", value: payment.status },

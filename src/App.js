@@ -15,6 +15,7 @@ import PrivateRoute from "./components/layout/PrivateRoute";
 import AdminRoute from "./components/layout/AdminRoute";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
+import AdminRegister from "./components/auth/AdminRegister";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import EventDetails from "./components/events/EventDetails";
 import Contact from "./pages/Contact";
@@ -48,6 +49,7 @@ function App() {
                     />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/admin-register" element={<AdminRegister />} />
 
                     {/* Protected routes */}
                     <Route

@@ -13,6 +13,7 @@ const EventAnalytics = () => {
     isLoadingAnalytics,
     error,
   } = useAdmin();
+  
 
 
   useEffect(() => {
@@ -137,6 +138,9 @@ const EventAnalytics = () => {
                   User
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Phone Number
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Amount
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -156,6 +160,11 @@ const EventAnalytics = () => {
                     </div>
                     <div className="text-sm text-gray-500">
                       {payment.user?.email}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {payment.user?.mobileNumber || ''}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

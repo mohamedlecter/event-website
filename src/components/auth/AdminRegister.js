@@ -10,7 +10,7 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
-    role: "user",
+    role: "admin",
     mobileNumber: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -129,7 +129,7 @@ const Register = () => {
                 required
               >
                 {countries.map((country) => (
-                 <option key={`${country.code}-${country.name}`} value={country.code}>
+                  <option key={`${country.code}-${country.name}`} value={country.code}>
                     {country.name} ({country.code})
                   </option>
                 ))}
