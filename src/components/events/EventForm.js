@@ -55,23 +55,23 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
     standardPrice: Yup.number()
       .required("Standard ticket price is required")
       .min(0, "Price must be greater than or equal to 0")
-      .max(10000, "Price must not exceed 10000"),
+      .max(1000000000, "Price must not exceed 1000000000"),
     
     standardQuantity: Yup.number()
       .required("Standard ticket quantity is required")
       .min(1, "Quantity must be at least 1")
-      .max(10000, "Quantity must not exceed 10000")
+      .max(1000000000, "Quantity must not exceed 1000000000")
       .integer("Quantity must be a whole number"),
     
     vipPrice: Yup.number()
       .required("VIP ticket price is required")
       .min(0, "Price must be greater than or equal to 0")
-      .max(10000, "Price must not exceed 10000"),
+      .max(1000000000, "Price must not exceed 1000000000"),
     
     vipQuantity: Yup.number()
       .required("VIP ticket quantity is required")
       .min(1, "Quantity must be at least 1")
-      .max(10000, "Quantity must not exceed 10000")
+      .max(1000000000, "Quantity must not exceed 1000000000")
       .integer("Quantity must be a whole number"),
     
     image: Yup.mixed()
