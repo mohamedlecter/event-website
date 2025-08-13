@@ -44,10 +44,6 @@ const Events = () => {
     switch (sortBy) {
       case 'date':
         return sortedEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-      case 'price-asc':
-        return sortedEvents.sort((a, b) => a.standardTicket.price - b.standardTicket.price);
-      case 'price-desc':
-        return sortedEvents.sort((a, b) => b.standardTicket.price - a.standardTicket.price);
       case 'name':
         return sortedEvents.sort((a, b) => a.title.localeCompare(b.title));
       default:
@@ -105,8 +101,6 @@ const Events = () => {
               aria-label="Sort events by"
             >
               <option value="date">Sort by Date</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
               <option value="name">Sort by Name</option>
             </select>
           </div>

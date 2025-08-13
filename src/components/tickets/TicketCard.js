@@ -71,11 +71,7 @@ const TicketCard = ({ ticket }) => {
     
     setIsTransferring(true);
     try {
-      await transferUserTicket(ticket._id, {
-        recipientType: transferType,
-        recipientValue,
-        recipientName
-      });
+      await transferUserTicket(ticket._id, recipientValue);
       setShowTransferForm(false);
       setRecipientValue('');
       setRecipientName('');
@@ -149,8 +145,8 @@ const TicketCard = ({ ticket }) => {
           <div className="flex items-start justify-between mb-4">
             <div>
               <h3 className="font-bold text-xl mb-1">{ticket.event.title}</h3>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getTicketTypeColor(ticket.ticketType)}`}>
-                {ticket.ticketType.toUpperCase()}
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getTicketTypeColor(ticket.ticketDetails.name)}`}>
+                {ticket.ticketDetails.name.toUpperCase()}
               </span>
             </div>
             <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -175,7 +171,7 @@ const TicketCard = ({ ticket }) => {
             </div>
             <div className="flex items-center text-gray-600">
               <span className="w-24 font-medium">Price:</span>
-              <span className="font-bold text-gray-900">GMD {ticket.price}</span>
+              <span className="font-bold text-gray-900">GMD {ticket.ticketDetails.price}</span>
             </div>
             <div className="flex items-center text-gray-600">
               <span className="w-24 font-medium">Reference:</span>
@@ -183,7 +179,7 @@ const TicketCard = ({ ticket }) => {
             </div>
             <div className="flex items-center text-gray-600">
               <span className="w-24 font-medium">Recipient:</span>
-              {ticket.recipientMobileNumber}
+              {ticket.recipient?.value || 'N/A'}
             </div>
           </div>
         </div>

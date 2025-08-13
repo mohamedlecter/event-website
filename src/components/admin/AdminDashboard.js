@@ -1,75 +1,79 @@
-import {useEffect} from "react";
-import {useAdmin} from "../../context/AdminContext";
+import { useEffect } from "react";
+import { useAdmin } from "../../context/AdminContext";
 
 const AdminDashboard = () => {
-  const { stats, isLoadingStats, error, fetchDashboardStats } = useAdmin();
+    const { stats, isLoadingStats, error, fetchDashboardStats } = useAdmin();
 
-  console.log("Admin loading", isLoadingStats);
+    useEffect(() => {
+        fetchDashboardStats();
+    }, [fetchDashboardStats]);
 
-  useEffect(() => {
-    fetchDashboardStats();
-  }, []);
+    if (isLoadingStats) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
+    if (!stats) return null;
 
-  if (!stats) return null;
+    return (
+        <div>
+            <h2 className="text-2xl font-bold mb-6">Dashboard Overview</h2>
 
-  console.log("Admin stats", stats);
-
-  return (
-    <div>
-      <h2 className="text-2xl font-bold mb-6">Dashboard Overview</h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatCard
-          title="Total Events"
-          value={stats.totalEvents}
-          icon="🎪"
-          color="bg-blue-100 text-blue-800"
-        />
-        <StatCard
-          title="Total Tickets Sold"
-          value={stats.totalTicketsSold}
-          icon="🎟️"
-          color="bg-green-100 text-green-800"
-        />
-        <StatCard
-          title="Standard Tickets Sold"
-          value={stats.standardTicketsSold}
-          icon="🔹"
-          color="bg-indigo-100 text-indigo-800"
-        />
-        <StatCard
-          title="VIP Tickets Sold"
-          value={stats.vipTicketsSold}
-          icon="✨"
-          color="bg-purple-100 text-purple-800"
-        />
-        <StatCard
-          title="Total Revenue"
-          value={`$${stats.totalRevenue.toLocaleString()}`}
-          icon="💰"
-          color="bg-yellow-100 text-yellow-800"
-        />
-        <StatCard
-          title="Scanned Tickets"
-          value={stats.totalScannedTickets}
-          icon="✅"
-          color="bg-teal-100 text-teal-800"
-        />
-      </div>
-    </div>
-  );
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <StatCard
+                    title="Total Events"
+                    value={stats.totalEvents}
+                    icon="🎪"
+                    color="bg-blue-100 text-blue-800"
+                />
+                <StatCard
+                    title="Total Tickets Sold"
+                    value={stats.totalTicketsSold}
+                    icon="🎟️"
+                    color="bg-green-100 text-green-800"
+                />
+                {Object.entries(stats.ticketsByType).map(([ticketName, soldCount]) => (
+                    <StatCard
+                        key={ticketName}
+                        title={`${ticketName} Tickets Sold`}
+                        value={soldCount}
+                        icon="🎫"
+                        color="bg-purple-100 text-purple-800"
+                    />
+                ))}
+                {Object.entries(stats.scannedByType).map(([ticketName, scannedCount]) => (
+                    <StatCard
+                        key={`scanned-${ticketName}`}
+                        title={`${ticketName} Tickets Scanned`}
+                        value={scannedCount}
+                        icon="✅"
+                        color="bg-teal-100 text-teal-800"
+                    />
+                ))}
+                <StatCard
+                    title="Total Revenue"
+                    value={`$${stats.totalRevenue.toLocaleString()}`}
+                    icon="💰"
+                    color="bg-yellow-100 text-yellow-800"
+                />
+                <StatCard
+                    title="Scanned Tickets"
+                    value={stats.totalScannedTickets}
+                    icon="🔍"
+                    color="bg-indigo-100 text-indigo-800"
+                />
+            </div>
+        </div>
+    );
 };
 
 const StatCard = ({ title, value, icon, color }) => (
-  <div className="bg-white p-6 rounded-lg shadow-sm border">
-    <div className="flex items-center">
-      <span className={`text-2xl mr-4 p-3 rounded-full ${color}`}>{icon}</span>
-      <div>
-        <p className="text-gray-500 text-sm">{title}</p>
-        <p className="text-2xl font-bold">{value}</p>
-      </div>
+    <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="flex items-center">
+            <span className={`text-2xl mr-4 p-3 rounded-full ${color}`}>{icon}</span>
+            <div>
+                <p className="text-gray-500 text-sm">{title}</p>
+                <p className="text-2xl font-bold">{value}</p>
+            </div>
+        </div>
     </div>
-  </div>
 );
 
 export default AdminDashboard;

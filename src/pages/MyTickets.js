@@ -17,23 +17,6 @@ const MyTickets = () => {
     getUserTickets();
   }, []);
 
-  // useEffect(() => {
-  //   if (tickets.length > 0) {
-  //     const now = new Date();
-  //     const stats = tickets.reduce((acc, ticket) => {
-  //       const eventDate = new Date(ticket.event.date);
-  //       acc.total++;
-  //       if (eventDate > now) {
-  //         acc.upcoming++;
-  //       } else {
-  //         acc.past++;
-  //       }
-  //       return acc;
-  //     }, { total: 0, upcoming: 0, past: 0});
-  //     setStats(stats);
-  //   }
-  // }, [tickets]);
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#C6D6D8C2] flex items-center justify-center">

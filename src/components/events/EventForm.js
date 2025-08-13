@@ -1,5 +1,5 @@
-import {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as Yup from 'yup';
 
 const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
@@ -8,10 +8,9 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
     description: event?.description || "",
     country: event?.location?.country || "",
     city: event?.location?.city || "",
-    standardPrice: event?.standardTicket?.price || 0,
-    standardQuantity: event?.standardTicket?.quantity || 0,
-    vipPrice: event?.vipTicket?.price || 0,
-    vipQuantity: event?.vipTicket?.quantity || 0,
+    ticketTypes: event?.ticketTypes && event.ticketTypes.length > 0
+      ? event.ticketTypes
+      : [{ name: "", price: "", quantity: "" }], // Use empty strings for initial state to avoid issues with controlled inputs
     date: event?.date ? new Date(event.date).toISOString().slice(0, 16) : "",
     category: event?.category || "music",
     image: null,
@@ -27,24 +26,24 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
       .required("Title is required")
       .min(3, "Title must be at least 3 characters")
       .max(100, "Title must not exceed 100 characters"),
-    
+
     description: Yup.string()
       .required("Description is required")
       .min(10, "Description must be at least 10 characters")
       .max(1000, "Description must not exceed 1000 characters"),
-    
+
     country: Yup.string()
       .required("Country is required")
       .min(2, "Country must be at least 2 characters"),
-    
+
     city: Yup.string()
       .required("City is required")
       .min(2, "City must be at least 2 characters"),
-    
+
     date: Yup.date()
       .required("Date is required")
       .min(new Date(), "Event date cannot be in the past"),
-    
+
     category: Yup.string()
       .required("Category is required")
       .oneOf(
@@ -52,27 +51,22 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
         "Invalid category selected"
       ),
     
-    standardPrice: Yup.number()
-      .required("Standard ticket price is required")
-      .min(0, "Price must be greater than or equal to 0")
-      .max(1000000000, "Price must not exceed 1000000000"),
-    
-    standardQuantity: Yup.number()
-      .required("Standard ticket quantity is required")
-      .min(1, "Quantity must be at least 1")
-      .max(1000000000, "Quantity must not exceed 1000000000")
-      .integer("Quantity must be a whole number"),
-    
-    vipPrice: Yup.number()
-      .required("VIP ticket price is required")
-      .min(0, "Price must be greater than or equal to 0")
-      .max(1000000000, "Price must not exceed 1000000000"),
-    
-    vipQuantity: Yup.number()
-      .required("VIP ticket quantity is required")
-      .min(1, "Quantity must be at least 1")
-      .max(1000000000, "Quantity must not exceed 1000000000")
-      .integer("Quantity must be a whole number"),
+    ticketTypes: Yup.array()
+      .of(
+        Yup.object().shape({
+          name: Yup.string().required("Ticket name is required"),
+          price: Yup.number()
+            .required("Price is required")
+            .min(0.01, "Price must be greater than 0")
+            .typeError("Price must be a number"),
+          quantity: Yup.number()
+            .required("Quantity is required")
+            .min(1, "Quantity must be at least 1")
+            .integer("Quantity must be a whole number")
+            .typeError("Quantity must be a number"),
+        })
+      )
+      .min(1, "At least one ticket type is required"),
     
     image: Yup.mixed()
       .test("fileSize", "Image size should be less than 5MB", (value) => {
@@ -140,6 +134,42 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
     }
   };
 
+  const handleTicketChange = (index, e) => {
+    const { name, value } = e.target;
+    const newTicketTypes = [...formData.ticketTypes];
+    newTicketTypes[index][name] = value;
+    setFormData((prev) => ({ ...prev, ticketTypes: newTicketTypes }));
+
+    // Clear specific error when user starts typing
+    const errorPath = `ticketTypes[${index}].${name}`;
+    if (errors[errorPath]) {
+      setErrors((prev) => ({ ...prev, [errorPath]: "" }));
+    }
+  };
+
+  const handleAddTicket = () => {
+    setFormData((prev) => ({
+      ...prev,
+      ticketTypes: [...prev.ticketTypes, { name: "", price: "", quantity: "" }],
+    }));
+  };
+
+  const handleRemoveTicket = (index) => {
+    setFormData((prev) => {
+      const newTicketTypes = [...prev.ticketTypes];
+      newTicketTypes.splice(index, 1);
+      return { ...prev, ticketTypes: newTicketTypes };
+    });
+    // Also remove the corresponding errors
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[`ticketTypes[${index}].name`];
+      delete newErrors[`ticketTypes[${index}].price`];
+      delete newErrors[`ticketTypes[${index}].quantity`];
+      return newErrors;
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -147,12 +177,15 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
       return;
     }
 
+    const preparedTicketTypes = formData.ticketTypes.map(ticket => ({
+        ...ticket,
+        price: Number(ticket.price),
+        quantity: Number(ticket.quantity)
+      }));
+
     const eventData = {
       ...formData,
-      standardPrice: Number(formData.standardPrice),
-      standardQuantity: Number(formData.standardQuantity),
-      vipPrice: Number(formData.vipPrice),
-      vipQuantity: Number(formData.vipQuantity),
+      ticketTypes: preparedTicketTypes,
     };
 
     onSubmit(eventData);
@@ -347,105 +380,95 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
 
         {/* Ticket Information */}
         <div className="space-y-4 sm:space-y-6">
-          <div className="flex items-center space-x-2">
-            <div className="h-6 sm:h-8 w-1 bg-blue-600 rounded-full"></div>
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Ticket Information</h3>
+          <div className="flex items-center space-x-2 justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="h-6 sm:h-8 w-1 bg-blue-600 rounded-full"></div>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Ticket Information</h3>
+            </div>
+            <button
+              type="button"
+              onClick={handleAddTicket}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Add Ticket
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-            {/* Standard Tickets */}
-            <div className="space-y-4">
-              <h4 className="text-base sm:text-lg font-medium text-gray-900">Standard Tickets *</h4>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Price
-                  </label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                      GMD 
-                    </span>
-                    <input
-                      type="number"
-                      name="standardPrice"
-                      value={formData.standardPrice}
-                      onChange={handleChange}
-                      min="0"
-                      step="0.01"
-                      className={`w-full pl-8 pr-3 sm:pr-4 py-2.5 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors text-base
-                        ${errors.standardPrice ? 'border-red-500' : 'border-gray-200'}`}
-                    />
-                  </div>
-                  {errors.standardPrice && (
-                    <p className="mt-1.5 text-sm text-red-500">{errors.standardPrice}</p>
+          <div className="space-y-6">
+            {formData.ticketTypes.map((ticket, index) => (
+              <div key={index} className="p-4 border rounded-lg space-y-4">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-base font-medium text-gray-900">Ticket Type {index + 1}</h4>
+                  {formData.ticketTypes.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTicket(index)}
+                      className="text-red-500 hover:text-red-700 transition-colors"
+                    >
+                      Remove
+                    </button>
                   )}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Quantity
-                  </label>
-                  <input
-                    type="number"
-                    name="standardQuantity"
-                    value={formData.standardQuantity}
-                    onChange={handleChange}
-                    min="0"
-                    className={`w-full px-3 sm:px-4 py-2.5 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors text-base
-                      ${errors.standardQuantity ? 'border-red-500' : 'border-gray-200'}`}
-                  />
-                  {errors.standardQuantity && (
-                    <p className="mt-1.5 text-sm text-red-500">{errors.standardQuantity}</p>
-                  )}
-                </div>
-              </div>
-            </div>
 
-            {/* VIP Tickets */}
-            <div className="space-y-4">
-              <h4 className="text-base sm:text-lg font-medium text-gray-900">VIP Tickets *</h4>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Price
-                  </label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                      GMD 
-                    </span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Ticket Name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={ticket.name}
+                      onChange={(e) => handleTicketChange(index, e)}
+                      className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                        errors[`ticketTypes[${index}].name`] ? 'border-red-500' : 'border-gray-200'
+                      }`}
+                      placeholder="e.g., Standard, VIP"
+                    />
+                    {errors[`ticketTypes[${index}].name`] && (
+                      <p className="mt-1 text-sm text-red-500">{errors[`ticketTypes[${index}].name`]}</p>
+                    )}
+                  </div>
+                  {/* Ticket Price */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Price *</label>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">GMD</span>
+                      <input
+                        type="number"
+                        name="price"
+                        value={ticket.price}
+                        onChange={(e) => handleTicketChange(index, e)}
+                        min="0"
+                        step="0.01"
+                        className={`w-full pl-10 pr-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                          errors[`ticketTypes[${index}].price`] ? 'border-red-500' : 'border-gray-200'
+                        }`}
+                      />
+                    </div>
+                    {errors[`ticketTypes[${index}].price`] && (
+                      <p className="mt-1 text-sm text-red-500">{errors[`ticketTypes[${index}].price`]}</p>
+                    )}
+                  </div>
+                  {/* Ticket Quantity */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
                     <input
                       type="number"
-                      name="vipPrice"
-                      value={formData.vipPrice}
-                      onChange={handleChange}
-                      min="0"
-                      step="0.01"
-                      className={`w-full pl-8 pr-3 sm:pr-4 py-2.5 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors text-base
-                        ${errors.vipPrice ? 'border-red-500' : 'border-gray-200'}`}
+                      name="quantity"
+                      value={ticket.quantity}
+                      onChange={(e) => handleTicketChange(index, e)}
+                      min="1"
+                      className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                        errors[`ticketTypes[${index}].quantity`] ? 'border-red-500' : 'border-gray-200'
+                      }`}
                     />
+                    {errors[`ticketTypes[${index}].quantity`] && (
+                      <p className="mt-1 text-sm text-red-500">{errors[`ticketTypes[${index}].quantity`]}</p>
+                    )}
                   </div>
-                  {errors.vipPrice && (
-                    <p className="mt-1.5 text-sm text-red-500">{errors.vipPrice}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Quantity
-                  </label>
-                  <input
-                    type="number"
-                    name="vipQuantity"
-                    value={formData.vipQuantity}
-                    onChange={handleChange}
-                    min="0"
-                    className={`w-full px-3 sm:px-4 py-2.5 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors text-base
-                      ${errors.vipQuantity ? 'border-red-500' : 'border-gray-200'}`}
-                  />
-                  {errors.vipQuantity && (
-                    <p className="mt-1.5 text-sm text-red-500">{errors.vipQuantity}</p>
-                  )}
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
 
