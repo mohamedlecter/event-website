@@ -164,7 +164,7 @@ const EventDetails = () => {
                                                         </p>
                                                     </div>
                                                     <span className="text-m font-bold text-gray-900">
-                                                        GMD {ticket.price}
+                                                        {ticket.currency} {ticket.price}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center justify-between mb-3">

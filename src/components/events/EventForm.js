@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from 'yup';
+import { useEvents } from "../../context/EventContext";
 
 const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
   const [formData, setFormData] = useState({
@@ -9,8 +10,11 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
     country: event?.location?.country || "",
     city: event?.location?.city || "",
     ticketTypes: event?.ticketTypes && event.ticketTypes.length > 0
-      ? event.ticketTypes
-      : [{ name: "", price: "", quantity: "" }], // Use empty strings for initial state to avoid issues with controlled inputs
+      ? event.ticketTypes.map(ticket => ({
+          ...ticket,
+          currency: ticket.currency || "GMD"
+        }))
+      : [{ name: "", price: "", quantity: "", currency: "GMD" }], // Add currency to initial state
     date: event?.date ? new Date(event.date).toISOString().slice(0, 16) : "",
     category: event?.category || "music",
     image: null,
@@ -18,7 +22,30 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
 
   const [previewImage, setPreviewImage] = useState(event?.image || null);
   const [errors, setErrors] = useState({});
+  const [availableCurrencies, setAvailableCurrencies] = useState(['USD', 'GMD', 'EUR', 'GBP']);
+  const [isLoadingCurrencies, setIsLoadingCurrencies] = useState(true);
   const navigate = useNavigate();
+  const { getCurrencies } = useEvents();
+
+  // Fetch available currencies on component mount
+  useEffect(() => {
+    const fetchCurrencies = async () => {
+      try {
+        setIsLoadingCurrencies(true);
+        const currencies = await getCurrencies();
+        // Ensure currencies is an array
+        const currencyArray = Array.isArray(currencies) ? currencies : ['USD', 'GMD', 'EUR', 'GBP'];
+        setAvailableCurrencies(currencyArray);
+      } catch (error) {
+        console.error('Failed to fetch currencies:', error);
+        // Fallback to default currencies
+        setAvailableCurrencies(['USD', 'GMD', 'EUR', 'GBP']);
+      } finally {
+        setIsLoadingCurrencies(false);
+      }
+    };
+    fetchCurrencies();
+  }, [getCurrencies]);
 
   // Validation schema
   const validationSchema = Yup.object().shape({
@@ -64,6 +91,9 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
             .min(1, "Quantity must be at least 1")
             .integer("Quantity must be a whole number")
             .typeError("Quantity must be a number"),
+          currency: Yup.string()
+            .required("Currency is required")
+            .oneOf(['USD', 'GMD', 'EUR', 'GBP'], "Invalid currency selected"),
         })
       )
       .min(1, "At least one ticket type is required"),
@@ -150,7 +180,7 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
   const handleAddTicket = () => {
     setFormData((prev) => ({
       ...prev,
-      ticketTypes: [...prev.ticketTypes, { name: "", price: "", quantity: "" }],
+      ticketTypes: [...prev.ticketTypes, { name: "", price: "", quantity: "", currency: "GMD" }],
     }));
   };
 
@@ -410,7 +440,7 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Ticket Name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
@@ -432,7 +462,9 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Price *</label>
                     <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">GMD</span>
+                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                        {ticket.currency}
+                      </span>
                       <input
                         type="number"
                         name="price"
@@ -464,6 +496,28 @@ const EventForm = ({ event, onSubmit, onCancel, isSubmitting }) => {
                     />
                     {errors[`ticketTypes[${index}].quantity`] && (
                       <p className="mt-1 text-sm text-red-500">{errors[`ticketTypes[${index}].quantity`]}</p>
+                    )}
+                  </div>
+                  {/* Ticket Currency */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Currency *</label>
+                    <select
+                      name="currency"
+                      value={ticket.currency}
+                      onChange={(e) => handleTicketChange(index, e)}
+                      className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                        errors[`ticketTypes[${index}].currency`] ? 'border-red-500' : 'border-gray-200'
+                      }`}
+                      disabled={isLoadingCurrencies}
+                    >
+                      {Array.isArray(availableCurrencies) && availableCurrencies.map((currency) => (
+                        <option key={currency} value={currency}>
+                          {currency}
+                        </option>
+                      ))}
+                    </select>
+                    {errors[`ticketTypes[${index}].currency`] && (
+                      <p className="mt-1 text-sm text-red-500">{errors[`ticketTypes[${index}].currency`]}</p>
                     )}
                   </div>
                 </div>

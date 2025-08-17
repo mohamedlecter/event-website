@@ -171,7 +171,7 @@ const TicketCard = ({ ticket }) => {
             </div>
             <div className="flex items-center text-gray-600">
               <span className="w-24 font-medium">Price:</span>
-              <span className="font-bold text-gray-900">GMD {ticket.ticketDetails.price}</span>
+              <span className="font-bold text-gray-900">{ticket.ticketDetails.currency} {ticket.ticketDetails.price}</span>
             </div>
             <div className="flex items-center text-gray-600">
               <span className="w-24 font-medium">Reference:</span>

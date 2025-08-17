@@ -136,7 +136,7 @@ const EventAnalytics = () => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm text-gray-900">
-                                            GMD {payment.amount}
+                                            {payment.amount} {payment?.currency || 'GMD'}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">

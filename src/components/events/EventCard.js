@@ -131,7 +131,7 @@ const EventCard = ({ event, viewMode }) => {
                         <div className="flex justify-between items-center">
                             <div>
                                 <span className="text-base font-bold text-gray-900">
-                                    GMD {firstTicketType.price}
+                                    {firstTicketType.currency} {firstTicketType.price}
                                 </span>
                                 <span className="text-xs text-gray-500 ml-1">
                                     / {firstTicketType.name}

@@ -14,6 +14,7 @@ const PaymentForm = ({ event, ticket, onClose }) => {
     const [recipientEmails, setRecipientEmails] = useState([""]);
     const [recipientType, setRecipientType] = useState("mobile");
     const [paymentGateway, setPaymentGateway] = useState("wave");
+    const [currency, setCurrency] = useState(ticket.currency || "GMD");
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState(null);
     const { purchaseTickets, isLoading } = useEvents();
@@ -68,6 +69,23 @@ const PaymentForm = ({ event, ticket, onClose }) => {
       const defaultCode = gambia ? gambia.code : (countries[0]?.code || "+1");
       setRecipientCountryCodes(Array(quantity).fill(defaultCode));
     }, [countries, quantity]);
+
+    // Set currency based on payment gateway and ticket currency
+    useEffect(() => {
+      if (paymentGateway === "wave") {
+        setCurrency("GMD");
+      } else {
+        // For Stripe, use the ticket's currency if available, otherwise default to GMD
+        setCurrency(ticket.currency || "GMD");
+      }
+    }, [paymentGateway, ticket.currency]);
+
+    // Set default payment gateway based on ticket currency
+    useEffect(() => {
+      if (ticket.currency !== "GMD") {
+        setPaymentGateway("stripe");
+      }
+    }, [ticket.currency]);
 
     // Max tickets now based on the `ticket` prop
     const maxTickets = ticket.quantity - ticket.sold;
@@ -176,12 +194,11 @@ const PaymentForm = ({ event, ticket, onClose }) => {
                     }));
 
             const paymentData = {
-                ticketType: ticket._id, // Pass the ticket ID
+                ticketTypeName: ticket.name, // Pass the ticket name instead of ID
                 quantity,
                 recipientType,
                 recipientInfo,
                 paymentGateway,
-                currency: "GMD",
             };
 
             const response = await purchaseTickets(eventIdStr, paymentData);
@@ -204,7 +221,6 @@ const PaymentForm = ({ event, ticket, onClose }) => {
         }
     };
 
-    const currency = "GMD";
     // Ticket price is now from the 'ticket' prop
     const ticketPrice = ticket.price;
     const totalAmount = ticketPrice * quantity;
@@ -233,13 +249,21 @@ const PaymentForm = ({ event, ticket, onClose }) => {
                             className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#FBA415] focus:border-[#FBA415] transition-colors duration-200"
                             disabled={isProcessing}
                         >
-                            <option value="wave">Wave Mobile Money</option>
+                            {ticket.currency === "GMD" && (
+                                <option value="wave">Wave Mobile Money</option>
+                            )}
                             <option value="stripe">Visa, MasterCard, Credit Card</option>
                         </select>
                         {paymentGateway === "wave" && (
                             <div className="text-sm text-gray-600 mt-2">
                                 <p>• Payments processed in GMD</p>
                                 <p>• Requires Wave mobile app</p>
+                            </div>
+                        )}
+                        {ticket.currency !== "GMD" && (
+                            <div className="text-sm text-gray-600 mt-2">
+                                <p>• Wave payment only available for GMD tickets</p>
+                                <p>• This ticket is priced in {ticket.currency}</p>
                             </div>
                         )}
                     </div>
@@ -356,13 +380,13 @@ const PaymentForm = ({ event, ticket, onClose }) => {
                                     {quantity} x {ticket.name} Ticket
                                 </span>
                                 <span className="font-medium text-gray-900">
-                                    {currency} {ticketPrice}
+                                    {ticket.currency || "GMD"} {ticketPrice}
                                 </span>
                             </div>
                             <div className="border-t pt-2 flex justify-between">
                                 <span className="font-bold text-gray-900">Total</span>
                                 <span className="font-bold text-gray-900">
-                                    {currency} {totalAmount}
+                                    {ticket.currency || "GMD"} {totalAmount}
                                 </span>
                             </div>
                         </div>

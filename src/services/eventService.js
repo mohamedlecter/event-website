@@ -1,5 +1,15 @@
 import apiClient from './apiClient';
 
+export const getAvailableCurrencies = async () => {
+  try {
+    const response = await apiClient.get('/events/currencies');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching available currencies:', error);
+    throw error;
+  }
+};
+
 export const fetchEvents = async (filters = {}) => {
   try {
     const response = await apiClient.get('/events', { params: filters });
@@ -86,6 +96,7 @@ export const createEvent = async (eventData) => {
       formData.append(`ticketTypes[${index}][name]`, ticket.name);
       formData.append(`ticketTypes[${index}][price]`, ticket.price);
       formData.append(`ticketTypes[${index}][quantity]`, ticket.quantity);
+      formData.append(`ticketTypes[${index}][currency]`, ticket.currency);
     });
 
     // Add image if it exists

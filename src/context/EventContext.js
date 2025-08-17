@@ -3,6 +3,7 @@ import {
     fetchEventDetails,
     fetchEvents,
     fetchUserTickets,
+    getAvailableCurrencies,
     initiatePayment,
     transferTicket,
     verifyPayment,
@@ -194,6 +195,16 @@ export const EventProvider = ({ children }) => {
         }
     }, [tickets]);
 
+    const getCurrencies = useCallback(async () => {
+        try {
+            const data = await getAvailableCurrencies();
+            return data;
+        } catch (err) {
+            setError(err.message || "Failed to fetch currencies. Please try again later.");
+            throw err;
+        }
+    }, []);
+
     return (
         <EventContext.Provider
             value={{
@@ -210,6 +221,7 @@ export const EventProvider = ({ children }) => {
                 confirmPayment,
                 getUserTickets,
                 transferUserTicket,
+                getCurrencies,
             }}
         >
             {children}
